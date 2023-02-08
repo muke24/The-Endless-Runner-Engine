@@ -171,16 +171,24 @@ MonoBehaviour:
     renderType: 0
     direction2D: 3
     direction3D: 2
+  scoring:
+    gameUsesCollectables: 1
   security:
-    quitIfDeviceCannotBeRecognised: 0
+    quitIfDeviceCannotBeRecognised: 1
   multiplayer:
     gameType: 0
     maxSplitscreenPlayers: 4
     maxConnections: 4
     currentConnections: 0
+    currentPlayers: 0
   player:
+    playerPrefab: {fileID: 0}
     localPlayer: {fileID: 0}
-    playerFloatiness: 1
+    spawnPlayerDuringStartCountdown: 1
+    secondsToSpawnPlayerDuringCountdown: 2
+    floatiness: 1
+    sideSpeed: 1
+    forwardSpeed: 1
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0

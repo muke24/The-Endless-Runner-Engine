@@ -55,20 +55,22 @@ namespace EndlessRunnerEngine
 
 		}
 
-		//[Serializable]
+		[Serializable]
 		public class Scoring
 		{
 			[HideInInspector]
 			public int score { get; internal set; }
 			[HideInInspector]
 			public int collectableScore { get; internal set; }
+
+			public bool gameUsesCollectables = true;
 		}
 
 		[Serializable]
 		public class Security
 		{
 			[SerializeField]
-			private bool quitIfDeviceCannotBeRecognised;
+			private bool quitIfDeviceCannotBeRecognised = true;
 
 
 		}
@@ -98,20 +100,37 @@ namespace EndlessRunnerEngine
 			[Tooltip("The maximum amount of players that can connect to the game.")]
 			public int maxConnections = 4;
 
-			[HideInInspector, Tooltip("The amount of players currently connected to the same server you are connected to.")]
-			public int currentConnections = 0;
+			[SerializeField, Tooltip("The amount of players currently connected to the same server you are connected to.")]
+			internal int currentConnections = 0;
+
+			public int currentPlayers = 0;
 		}
 
 		[Serializable]
 		public class Player
 		{
+			[Tooltip("This is the player prefab. Don't get this confused with different player skins, as the skin is apart of the Player script.")]
+			public EndlessRunnerEngine.Player playerPrefab;
+
 			[HideInInspector, Tooltip("Retrieves the local player. This must be used in both singleplayer and multiplayer play types.")]
 			public EndlessRunnerEngine.Player localPlayer;
 
+			// Multiplayer (this must be called from the server only and recieved by the clients from the server)			[ConditionalField(nameof(spawnPlayerDuringStartCountdown)), SerializeField]
+			[SerializeField, Tooltip("Whether the player will spawn during the game start countdown, or after the countdown finishes.")]
+			internal bool spawnPlayerDuringStartCountdown = true;
+
+			// Multiplayer (this must be called from the server only and recieved by the clients from the server)			[ConditionalField(nameof(spawnPlayerDuringStartCountdown)), SerializeField]
+			[ConditionalField(nameof(spawnPlayerDuringStartCountdown)), SerializeField]
+			internal int secondsToSpawnPlayerDuringCountdown = 2;
+
 			[SerializeField, Tooltip("How responsive the player will feel. This is useful for plane games where the player can't instantly move left and right.")]
-			internal float playerFloatiness;
+			internal float floatiness;
 
+			[SerializeField, Tooltip("Speed that the player will move side to side.")]
+			internal float sideSpeed;
 
+			[SerializeField, Tooltip("Speed that the player will move forwards.")]
+			internal float forwardSpeed;
 
 		}
 
