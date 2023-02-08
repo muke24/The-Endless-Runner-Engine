@@ -1,0 +1,16 @@
+{
+    "name": "TheEndlessRunnerEngine",
+    "rootNamespace": "EndlessRunnerEngine",
+    "references": [
+        "MyBox"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
