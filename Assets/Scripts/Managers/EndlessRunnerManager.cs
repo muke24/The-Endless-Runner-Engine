@@ -13,6 +13,8 @@ namespace EndlessRunnerEngine
 	{
 		#region Singleton
 		public static EndlessRunnerManager instance { get; private set; }
+		
+		[ExecuteInEditMode]
 		public static EndlessRunnerManager editorInstance
 		{
 			get
@@ -22,6 +24,7 @@ namespace EndlessRunnerEngine
 					instance = FindObjectOfType<EndlessRunnerManager>();
 					if (instance == null)
 					{
+
 						GameObject go = new GameObject("EndlessRunnerManager");
 						instance = go.AddComponent<EndlessRunnerManager>();
 					}
@@ -31,17 +34,21 @@ namespace EndlessRunnerEngine
 		}
 		#endregion
 
+		public static EndlessRunnerEngine.Player localPlayer;
+
 		public Render render;
 		public Game game;
 		public Scoring scoring;
-		public Security security;
 		public Multiplayer multiplayer;
 		public Player player;
 		public Environment environment;
+		public Application application;
+		public Scene scene;
+
 		[SerializeField]
 		private ScriptOptions scriptOptions;
-		public Application application;
-
+		[SerializeField]
+		private Security security;
 
 		#region Variable Classes
 		[Serializable]
@@ -92,7 +99,7 @@ namespace EndlessRunnerEngine
 		}
 
 		[Serializable]
-		public class Security
+		internal class Security
 		{
 			[SerializeField]
 			private bool quitIfDeviceCannotBeRecognised = true;
@@ -104,7 +111,7 @@ namespace EndlessRunnerEngine
 		public class Game
 		{
 			[SerializeField, Tooltip("The whole look to the game. This can be used to create the entire look of the game.")]
-			internal Theme gameTheme;
+			internal UITheme uiTheme;
 
 			public enum PlayType { Singleplayer, Multiplayer }
 
@@ -167,7 +174,7 @@ namespace EndlessRunnerEngine
 			[SerializeField, Tooltip("How many rows to spawn ahead of player. This is useful for 3D as you are able to see in front of the player, meaning more of the world will need to be visable.")]
 			internal int rowsToSpawn = 3;
 
-			[SerializeField, Tooltip("This is for editing the world surroundings. Eg, spawning trees in selected areas at a random spawn rate. Or spawning constants like side walls for a 2d game.")]
+			[Tooltip("This is for editing the world surroundings. Eg, spawning trees in selected areas at a random spawn rate. Or spawning constants like side walls for a 2d game.")]
 			internal CustomSpawner[] customSpawners;
 		}
 
@@ -183,6 +190,16 @@ namespace EndlessRunnerEngine
 		{
 			public bool useVsync = false;
 			public int targetFps = 0;
+		}
+
+		[Serializable]
+		public class Scene
+		{
+			[SerializeField]
+			internal bool gameOnSeperateScene = true;
+			[SerializeField, ConditionalField(nameof(gameOnSeperateScene))]
+			internal SceneReference gameScene = null;
+
 		}
 		#endregion
 

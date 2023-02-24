@@ -3,19 +3,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace EndlessRunnerEngine
 {
     public class Level : ScriptableObject
     {
-        public enum Difficulty { Easy, Normal, Hard }
-		[Tooltip("This is the difficulty level of this game level.")]
-        public Difficulty difficulty = Difficulty.Normal;
+        public LevelData levelData;
+        public LevelTheme levelTheme;
 
-        internal float obstacleSpacing = 10f;
+		[Serializable]
+        public class LevelData
+		{
+            public enum Difficulty { Easy, Normal, Hard }
+            [Tooltip("This is the difficulty level of this game level.")]
+            public Difficulty difficulty = Difficulty.Normal;
 
-        internal bool levelUsesCollectables = true;
+			[SerializeField]
+            internal float obstacleSpacing = 10f;
 
-        internal Collectable[] collectables;
+            internal bool levelUsesCollectables = true;
+            internal Collectable[] collectables;
+
+        }
+
+        public class LevelTheme
+		{
+            
+		}
     }
 }

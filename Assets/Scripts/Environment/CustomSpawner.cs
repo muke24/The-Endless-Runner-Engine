@@ -13,5 +13,10 @@ namespace EndlessRunnerEngine
 
 		[SerializeField]
         internal Vector3 objectSpawnPosition;
+
+        internal void Generate()
+		{
+
+		}
     }
 }
