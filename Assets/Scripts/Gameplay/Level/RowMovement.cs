@@ -7,7 +7,7 @@ using System;
 
 namespace EndlessRunnerEngine
 {
-	public class LevelMovement : MonoBehaviour
+	public class RowMovement : MonoBehaviour
 	{
 		[SerializeField]
 		internal InternalValues internalValues;
@@ -56,7 +56,7 @@ namespace EndlessRunnerEngine
 			{
 				for (int i = 0; i < internalValues.rowParent.childCount; i++)
 				{
-					Destroy(internalValues.rowParent.GetChild(i));
+					Destroy(internalValues.rowParent.GetChild(i).gameObject);
 				}
 			}
 			#endregion
@@ -66,14 +66,26 @@ namespace EndlessRunnerEngine
 
 			for (int i = 0; i < customisation.amountOfRowsToSpawn; i++)
 			{
+				//internalValues.spawnedRows[i] = Instantiate(customisation.rowsThatCanSpawn[UnityEngine.Random.Range(0, customisation.rowsThatCanSpawn.Length)]);
+
 				if (customisation.amountOfRowsToSpawn > customisation.rowsThatCanSpawn.Length)
 				{
 
 				}
+				else if (customisation.amountOfRowsToSpawn < customisation.rowsThatCanSpawn.Length)
+				{
+					// Set this so it spawns the rest in another for loop
+					if (i == customisation.amountOfRowsToSpawn - 1) // If last obstacle in obstacles to spawn is being spawned but more obstacles are to spawn
+					{
+						for (int x = 0; x < (customisation.rowsThatCanSpawn.Length - customisation.amountOfRowsToSpawn); x++)
+						{
+
+						}
+					}
+				}
 				else
 				{
-					internalValues.spawnedRows[i] = Instantiate(customisation.rowsThatCanSpawn[UnityEngine.Random.Range(0, customisation.rowsThatCanSpawn.Length)]);
-
+					internalValues.spawnedRows[i] = Instantiate(customisation.rowsThatCanSpawn[i]);
 				}
 			}
 			#endregion
@@ -81,12 +93,15 @@ namespace EndlessRunnerEngine
 
 		private void Update()
 		{
-			
+			MoveRows();
 		}
 
-		void RowMovement()
+		void MoveRows()
 		{
+			for (int i = 0; i < internalValues.spawnedRows.Length; i++)
+			{
 
+			}
 		}
 
 	}

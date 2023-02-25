@@ -61,9 +61,13 @@ namespace EndlessRunnerEngine
 			[Serializable]
 			public class KeyboardControls
 			{
-				public KeyCode upButton = KeyCode.UpArrow;
-				public KeyCode downButton = KeyCode.DownArrow;
+				[SearchableEnum]
+				public KeyCode forwardButton = KeyCode.UpArrow;
+				[SearchableEnum]
+				public KeyCode backwardButton = KeyCode.DownArrow;
+				[SearchableEnum]
 				public KeyCode leftButton = KeyCode.LeftArrow;
+				[SearchableEnum]
 				public KeyCode rightButton = KeyCode.RightArrow;
 
 				public AlternativeControls alternativeControls;
@@ -71,9 +75,13 @@ namespace EndlessRunnerEngine
 				[Serializable]
 				public class AlternativeControls
 				{
-					public KeyCode upButton = KeyCode.W;
-					public KeyCode downButton = KeyCode.S;
+					[SearchableEnum]
+					public KeyCode forwardButton = KeyCode.W;
+					[SearchableEnum]
+					public KeyCode backwardButton = KeyCode.S;
+					[SearchableEnum]
 					public KeyCode leftButton = KeyCode.A;
+					[SearchableEnum]
 					public KeyCode rightButton = KeyCode.D;
 				}
 			}

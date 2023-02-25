@@ -39,7 +39,7 @@ namespace EndlessRunnerEngine
 		public Render render;
 		public Game game;
 		public Scoring scoring;
-		public Multiplayer multiplayer;
+		public Connection connection;
 		public Player player;
 		public Environment environment;
 		public Application application;
@@ -110,7 +110,9 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		public class Game
 		{
-			[SerializeField, Tooltip("The whole look to the game. This can be used to create the entire look of the game.")]
+			public string gameName = "Game";
+
+			[SerializeField, Tooltip("The whole ui to the game. This can be used to create the entire look of the games user interface.")]
 			internal UITheme uiTheme;
 
 			public enum PlayType { Singleplayer, Multiplayer }
@@ -120,21 +122,38 @@ namespace EndlessRunnerEngine
 		}
 
 		[Serializable]
-		public class Multiplayer
+		public class Connection
 		{
+			public bool ConnectedToInternet
+			{
+				get
+				{
+					if (UnityEngine.Application.internetReachability == NetworkReachability.NotReachable)
+					{
+						return false;
+					}
+					else
+					{
+						return true;
+					}
+				}
+			}
+
 			public enum GameType { Regular, Splitscreen }
 			[HideInInspector, Tooltip("Is the game currently splitscreen?")]
 			public GameType gameType;
 
 			[Range(2, 4), Tooltip("The maximum amount of players that can use splitscreen.")]
 			public int maxSplitscreenPlayers = 4;
-			[Tooltip("The maximum amount of players that can connect to the game.")]
-			public int maxConnections = 4;
+			[SerializeField, Tooltip("The maximum amount of players that can connect to the game.")]
+			internal int maxConnections = 4;
+			[SerializeField, Tooltip("The maximum amount of connected players that can play the game (useful for having spectators).")]
+			internal int maxPlayers = 4;
 
-			[SerializeField, Tooltip("The amount of players currently connected to the same server you are connected to.")]
+			[Tooltip("The amount of players currently connected to the same server you are connected to.")]
 			internal int currentConnections = 0;
-
-			public int currentPlayers = 0;
+			[Tooltip("The amount of players currently playing same server you are connected to.")]
+			internal int currentPlayers = 0;
 		}
 
 		[Serializable]
@@ -253,15 +272,17 @@ namespace EndlessRunnerEngine
 		}
 
 		/// <summary>
-		/// This gets called every X seconds. It should be used for any checks that are constantly neccessary but dont need to be updated every frame.
+		/// This gets called every X seconds. It should be used for any checks that are constantly neccessary (such as if the game is connected to the internet or something) but dont need to be updated every frame.
 		/// </summary>
 		private void SlowUpdate()
 		{
-
+			
 		}
 
-
+		private void SetupUI()
+		{
+			UIManager.instance.ApplyUITheme();
+		}
 		#endregion
 	}
-
 }
