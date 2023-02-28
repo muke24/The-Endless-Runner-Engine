@@ -65,7 +65,7 @@ namespace EndlessRunnerEngine
 			public TextMeshProUGUI[] scoreRefText;
 			public TextMeshProUGUI[] collectableText;
 			public TextMeshProUGUI[] collectableRefText;
-			public TextMeshProUGUI[] collectableRefImg;
+			public Image[] collectableRefImg;
 		}
 
 		[Serializable]
