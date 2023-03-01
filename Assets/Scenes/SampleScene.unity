@@ -592,22 +592,5 @@ PrefabInstance:
       propertyPath: m_Name
       value: Level
       objectReference: {fileID: 0}
-    - target: {fileID: 8374643793513694671, guid: 4ba7e798f58ca97408bb0b0aa8b46151,
-        type: 3}
-      propertyPath: customisation.rowsThatCanSpawn.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8374643793513694671, guid: 4ba7e798f58ca97408bb0b0aa8b46151,
-        type: 3}
-      propertyPath: customisation.rowsThatCanSpawn.Array.data[0]
-      value: 
-      objectReference: {fileID: 8421102653202894827, guid: fb53bb78f310b0b4b94a63ea609d929a,
-        type: 3}
-    - target: {fileID: 8374643793513694671, guid: 4ba7e798f58ca97408bb0b0aa8b46151,
-        type: 3}
-      propertyPath: customisation.rowsThatCanSpawn.Array.data[1]
-      value: 
-      objectReference: {fileID: 8421102653202894827, guid: fb53bb78f310b0b4b94a63ea609d929a,
-        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ba7e798f58ca97408bb0b0aa8b46151, type: 3}

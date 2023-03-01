@@ -25,7 +25,7 @@ namespace EndlessRunnerEngine
 		public class StartupScreen
 		{
 			// Arrays used for different platforms
-			public TextMeshProUGUI[] titleText;
+			public TextMeshProUGUI[] companyText;
 
 		}
 

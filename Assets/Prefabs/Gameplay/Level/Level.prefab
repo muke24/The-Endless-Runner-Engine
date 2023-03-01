@@ -48,7 +48,8 @@ MonoBehaviour:
   internalValues:
     rowParent: {fileID: 3648344106687839560}
   customisation:
-    rowsThatCanSpawn: []
+    rowsThatCanSpawn:
+    - {fileID: 8421102653202894827, guid: fb53bb78f310b0b4b94a63ea609d929a, type: 3}
     amountOfRowsToSpawn: 5
 --- !u!1 &3648344107235518006
 GameObject:
