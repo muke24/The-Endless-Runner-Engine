@@ -13,11 +13,25 @@ namespace EndlessRunnerEngine
 	{
 		public static UIManager instance;
 
+		public Pages pages;
+
+		public int currentPage = 0;
+
 		public StartupScreen startupUI;
 		public MainMenu menuUI;
 		public GameStarting gameStartingUI;
 		public InGame inGameUI;
 		public Death deathUI;
+
+		[Serializable]
+		public class Pages
+		{
+			[Tooltip("Each page is the index number.")]
+			public GameObject[] gamePages;
+
+			[SerializeField]
+			internal GameObject[,] gamePlatformPages;
+		}
 
 		// Each class represents a "UI scene". The game may not utilise different scenes such as a 2D runner game.
 		// So all UI will need to be referenced.
@@ -104,9 +118,46 @@ namespace EndlessRunnerEngine
 			}
 		}
 
+		void PlatformSetup()
+		{
+			for (int i = 0; i < pages.gamePages.Length; i++)
+			{
+				for (int x = 0; x < pages.gamePages[i].transform.childCount; x++)
+				{
+					if (true)
+					{
+
+					}
+				}
+			}
+		}
+
 		public void ApplyUITheme()
 		{
 
+		}
+
+		private void Start()
+		{
+			SetPage(0);
+		}
+
+		public void SetPage(int pageIndex)
+		{
+			for (int i = 0; i < pages.gamePages.Length; i++)
+			{
+				pages.gamePages[i].SetActive(false);
+
+				for (int x = 0; x < pages.gamePages[i].transform.childCount; x++)
+				{
+					pages.gamePages[i].transform.GetChild(x).gameObject.SetActive(false);
+				}
+			}
+
+			pages.gamePages[pageIndex].SetActive(true);
+			pages.gamePages[pageIndex].transform.GetChild((int)EndlessRunnerManager.instance.version.platformScreens).gameObject.SetActive(true);
+
+			currentPage = pageIndex;
 		}
 	}
 }

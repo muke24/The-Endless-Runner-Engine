@@ -13,7 +13,7 @@ namespace EndlessRunnerEngine
 	{
 		#region Singleton
 		public static EndlessRunnerManager instance { get; private set; }
-		
+
 		[ExecuteInEditMode]
 		public static EndlessRunnerManager editorInstance
 		{
@@ -36,6 +36,8 @@ namespace EndlessRunnerEngine
 
 		public static EndlessRunnerEngine.Player localPlayer;
 
+		[SerializeField]
+		internal Version version;
 		public Render render;
 		public Game game;
 		public Scoring scoring;
@@ -56,8 +58,23 @@ namespace EndlessRunnerEngine
 		{
 			internal enum GameVersion { Regular, Business, Educational, Rental }
 
-			[SerializeField, Tooltip("For business use. Remove this when on asset store.")]
+			[Tooltip("For business use. Remove this when on asset store.")]
 			internal GameVersion gameVersion;
+
+			public enum PlatformScreens { Landscape, Portrait }
+			[SerializeField]
+			public PlatformScreens platformScreens;
+			public int platformScreensCount
+			{
+				get
+				{
+					return Enum.GetValues(typeof(PlatformScreens)).Length;
+				}
+			}
+
+			public enum PlatformType { Mobile = 0, PC = 1, Console = 2 }
+			[SerializeField]
+			public PlatformType platformType = PlatformType.Mobile;
 		}
 
 		[Serializable]
@@ -137,7 +154,9 @@ namespace EndlessRunnerEngine
 						return true;
 					}
 				}
+
 			}
+
 
 			public enum GameType { Regular, Splitscreen }
 			[HideInInspector, Tooltip("Is the game currently splitscreen?")]
@@ -261,6 +280,8 @@ namespace EndlessRunnerEngine
 		private void Initialise()
 		{
 			StartCoroutine(SlowUpdateCaller());
+
+			//version.platformScreensCount = Enum.GetValues(typeof(Version.PlatformScreens)).Length;
 		}
 
 		/// <summary>
@@ -276,8 +297,9 @@ namespace EndlessRunnerEngine
 		/// </summary>
 		private void SlowUpdate()
 		{
-			
+
 		}
+
 
 		private void SetupUI()
 		{
