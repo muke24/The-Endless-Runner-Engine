@@ -300,10 +300,14 @@ namespace EndlessRunnerEngine
 
 		}
 
-
 		private void SetupUI()
 		{
 			UIManager.instance.ApplyUITheme();
+		}
+
+		public void StartEndlessGame()
+		{
+
 		}
 		#endregion
 	}

@@ -16,8 +16,8 @@ namespace EndlessRunnerEngine
 		private float timeToStay = 1f;
 		[SerializeField, Range(0.1f, 5f)]
 		private float fadeOutSpeed = 1;
-		[SerializeField, Range(0.1f, 5f)]
-		private float timeToChangeScene;
+		[SerializeField, Range(0f, 5f)]
+		private float timeToChangePage;
 
 		[SerializeField]
         private bool useImage;
@@ -179,7 +179,7 @@ namespace EndlessRunnerEngine
 
 		IEnumerator PageChange()
 		{
-			float timer = timeToChangeScene;
+			float timer = timeToChangePage;
 
 			while (true)
 			{
