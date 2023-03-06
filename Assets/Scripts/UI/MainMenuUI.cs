@@ -28,13 +28,13 @@ namespace EndlessRunnerEngine
 		#endregion
 
 		[SerializeField, Space]
-		private Button settingsButton;
+		private Button[] settingsButton;
 
 		[SerializeField]
-		private Button personalisationButton;
+		private Button[] personalisationButton;
 
 		[SerializeField]
-		private Button startGameButton;
+		private Button[] startGameButton;
 
 		private void Start()
 		{
@@ -45,14 +45,28 @@ namespace EndlessRunnerEngine
 
 		void SetupButtons()
 		{
-			settingsButton.onClick.AddListener(SettingsButtonPressed);
-			personalisationButton.onClick.AddListener(PersonalisationButtonPressed);
-			startGameButton.onClick.AddListener(StartGameButtonPressed);
+			for (int i = 0; i < settingsButton.Length; i++)
+			{
+				settingsButton[i].onClick.AddListener(SettingsButtonPressed);
+			}
+
+			for (int i = 0; i < personalisationButton.Length; i++)
+			{
+				personalisationButton[i].onClick.AddListener(PersonalisationButtonPressed);
+			}
+
+			for (int i = 0; i < startGameButton.Length; i++)
+			{
+				startGameButton[i].onClick.AddListener(StartGameButtonPressed);
+			}
+			
 		}
 
 		void StartGameButtonPressed()
 		{
 			Debug.Log("Start game has been tapped!");
+
+			UIManager.instance.SetPage(4);
 		}
 
 		void SettingsButtonPressed()

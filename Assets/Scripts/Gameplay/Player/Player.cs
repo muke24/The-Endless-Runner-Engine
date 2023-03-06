@@ -25,6 +25,18 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		internal class Movement
 		{
+			[SerializeField, Tooltip("How responsive the player will feel. This is useful for plane games where the player can't instantly move left and right.")]
+			internal float floatiness = 1;
+
+			[SerializeField, Tooltip("Speed that the player will move side to side.")]
+			internal float sideSpeed = 1;
+
+			[SerializeField, Tooltip("Speed that the player will move forwards.")]
+			internal float forwardSpeed = 1;
+
+			[SerializeField, Tooltip("General speed of the player. This affects both side speed and forwards speed concurrently.")]
+			internal float generalSpeed = 1;
+
 			internal float playerAngle = 0f;
 			internal float playerStartAngle = 0f;
 		}

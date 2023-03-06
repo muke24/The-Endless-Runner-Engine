@@ -15,8 +15,7 @@ namespace EndlessRunnerEngine
 
 		public Pages pages;
 
-		public int currentPage = 0;
-
+		[Space]
 		public StartupScreen startupUI;
 		public MainMenu menuUI;
 		public GameStarting gameStartingUI;
@@ -26,11 +25,10 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		public class Pages
 		{
+			public int currentPage = 0;
+
 			[Tooltip("Each page is the index number.")]
 			public GameObject[] gamePages;
-
-			[SerializeField]
-			internal GameObject[,] gamePlatformPages;
 		}
 
 		// Each class represents a "UI scene". The game may not utilise different scenes such as a 2D runner game.
@@ -75,6 +73,7 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		public class Death
 		{
+			public TextMeshProUGUI[] toolTipText;
 			public TextMeshProUGUI[] scoreText;
 			public TextMeshProUGUI[] scoreRefText;
 			public TextMeshProUGUI[] collectableText;
@@ -157,7 +156,7 @@ namespace EndlessRunnerEngine
 			pages.gamePages[pageIndex].SetActive(true);
 			pages.gamePages[pageIndex].transform.GetChild((int)EndlessRunnerManager.instance.version.platformScreens).gameObject.SetActive(true);
 
-			currentPage = pageIndex;
+			pages.currentPage = pageIndex;
 		}
 	}
 }

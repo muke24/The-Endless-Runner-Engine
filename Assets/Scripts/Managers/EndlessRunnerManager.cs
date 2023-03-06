@@ -191,19 +191,6 @@ namespace EndlessRunnerEngine
 			// Multiplayer (this must be called from the server only and recieved by the clients from the server)			[ConditionalField(nameof(spawnPlayerDuringStartCountdown)), SerializeField]
 			[ConditionalField(nameof(spawnPlayerDuringStartCountdown)), SerializeField]
 			internal int secondsToSpawnPlayerDuringCountdown = 2;
-
-			[SerializeField, Tooltip("How responsive the player will feel. This is useful for plane games where the player can't instantly move left and right.")]
-			internal float floatiness = 1;
-
-			[SerializeField, Tooltip("Speed that the player will move side to side.")]
-			internal float sideSpeed = 1;
-
-			[SerializeField, Tooltip("Speed that the player will move forwards.")]
-			internal float forwardSpeed = 1;
-
-			[SerializeField, Tooltip("General speed of the player. This affects both side speed and forwards speed concurrently.")]
-			internal float generalSpeed = 1;
-
 		}
 
 		[Serializable]
@@ -234,8 +221,12 @@ namespace EndlessRunnerEngine
 		public class Scene
 		{
 			[SerializeField]
-			internal bool gameOnSeperateScene = true;
-			[SerializeField, ConditionalField(nameof(gameOnSeperateScene))]
+			internal bool useSeparateScenes = true;
+			[SerializeField, ConditionalField(nameof(useSeparateScenes))]
+			internal SceneReference startupScene = null;
+			[SerializeField, ConditionalField(nameof(useSeparateScenes))]
+			internal SceneReference menuScene = null;
+			[SerializeField, ConditionalField(nameof(useSeparateScenes))]
 			internal SceneReference gameScene = null;
 
 		}
@@ -265,6 +256,8 @@ namespace EndlessRunnerEngine
 			{
 				instance = this;
 			}
+
+			DontDestroyOnLoad(gameObject);
 
 			Initialise();
 		}
