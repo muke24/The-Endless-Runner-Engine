@@ -7,7 +7,8 @@ using MyBox;
 
 namespace EndlessRunnerEngine
 {
-	public class GameLevel : MonoBehaviour
+	[CreateAssetMenu(fileName = "LevelData", menuName = "Managers/Game Level Data", order = 1)]
+	public class GameLevel : ScriptableObject
 	{
 		internal string levelName = "New Level";
 

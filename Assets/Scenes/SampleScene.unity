@@ -434,6 +434,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e409b4f4d5d20c45bf97f0d4096454c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movement:
+    floatiness: 1
+    sideSpeed: 1
+    forwardSpeed: 1
+    generalSpeed: 1
   model:
     twoDimentional:
       playerModel2D: {fileID: 0}
