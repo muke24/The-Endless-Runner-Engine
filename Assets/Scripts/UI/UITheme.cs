@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace EndlessRunnerEngine
 {
-    [CreateAssetMenu(fileName = "NewTheme", menuName = "Create Endless Runner Theme")]
+    [CreateAssetMenu(fileName = "New UI Theme", menuName = "UI Theme")]
     public class UITheme : ScriptableObject
     {
         public enum ThemeType { ThreeDimentional, TwoDimentional }
@@ -27,8 +27,8 @@ namespace EndlessRunnerEngine
 		public class Global
 		{
 			// Arrays used for different platforms
-			[Tooltip("If image is not null, image will be used instead.")]
-			public string titleText = "Game";
+			[Tooltip("If image is not null, image will be used instead of title text.")]
+			//public string titleText = "Game";
 			public Sprite titleImage = null;
 			public Sprite collectableRefImg = null;
 
@@ -41,7 +41,7 @@ namespace EndlessRunnerEngine
 			// Arrays used for different platforms
 			public Sprite settingsButtonImg = null;
 			public string clickToPlayText = "Tap to play!";
-			public string copyrightText = "Copyright COMPANY 2023©";
+			//public string copyrightText = "Copyright © COMPANY 2023";
 		}
 
 		[Serializable]

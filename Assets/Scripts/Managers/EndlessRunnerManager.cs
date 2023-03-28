@@ -34,7 +34,9 @@ namespace EndlessRunnerEngine
 		}
 		#endregion
 
+		#region Variables
 		public static EndlessRunnerEngine.Player localPlayer;
+		public static Level currentLoadedLevel;
 
 		[SerializeField]
 		internal Version version;
@@ -46,11 +48,13 @@ namespace EndlessRunnerEngine
 		public Environment environment;
 		public Application application;
 		public Scene scene;
+		public Settings settings;
 
 		[SerializeField]
 		private ScriptOptions scriptOptions;
 		[SerializeField]
 		private Security security;
+		#endregion
 
 		#region Variable Classes
 		[Serializable]
@@ -127,8 +131,6 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		public class Game
 		{
-			public string gameName = "Game";
-
 			[SerializeField, Tooltip("The whole ui to the game. This can be used to create the entire look of the games user interface.")]
 			internal UITheme uiTheme;
 
@@ -238,6 +240,13 @@ namespace EndlessRunnerEngine
 			[SerializeField, ConditionalField(nameof(gameOnSeperateScene))]
 			internal SceneReference gameScene = null;
 
+		}
+
+		[Serializable]
+		public class Settings
+		{
+			public readonly string companyName = "Playify"; 
+			public readonly string gameName = "Paper Plane"; 
 		}
 		#endregion
 

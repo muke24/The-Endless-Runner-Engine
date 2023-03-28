@@ -6,6 +6,7 @@ using UnityEngine;
 using System;
 using TMPro;
 using UnityEngine.UI;
+using UnityEditor;
 
 namespace EndlessRunnerEngine
 {
@@ -13,12 +14,19 @@ namespace EndlessRunnerEngine
 	{
 		public static UIManager instance;
 
+		private EndlessRunnerManager erm;
+
+		[Range(0.5f, 2f)]
+		public float uiScale = 1;
+
+		public UITheme uiTheme;
+
 		public Pages pages;
 
 		public int currentPage = 0;
 
-		public StartupScreen startupUI;
-		public MainMenu menuUI;
+		//public StartupScreen startupUI;
+		public MainMenu mainMenuUI;
 		public GameStarting gameStartingUI;
 		public InGame inGameUI;
 		public Death deathUI;
@@ -60,6 +68,7 @@ namespace EndlessRunnerEngine
 			public TextMeshProUGUI[] countdownTimerText;
 			public TextMeshProUGUI[] titleText;
 			public TextMeshProUGUI[] tooltipText;
+			public Image[] titleImage = null;
 		}
 
 		[Serializable]
@@ -134,12 +143,54 @@ namespace EndlessRunnerEngine
 
 		public void ApplyUITheme()
 		{
+			int platform = (int)erm.version.platformType;
+
+			
+
+			#region Starting
+
+			#endregion
+
+			#region Game
+
+			#endregion
+		}
+
+		public void ApplyMainMenuTheme()
+		{
+			int platform = (int)erm.version.platformType;
+			mainMenuUI.copyrightText[platform].text = "Copyright © " + erm.settings.companyName + " 2023. All Rights Reserved.";
+			mainMenuUI.clickToPlayText[platform].text = uiTheme.menuUI.clickToPlayText;
+			
+			ApplyTitle(mainMenuUI.titleText[platform], mainMenuUI.titleImage[platform]);
+		}
+
+		private void ApplyTitle(TextMeshProUGUI titleText, Image titleImg)
+		{
+			
+			if (uiTheme.global.titleImage == null)
+			{
+				titleText.text = erm.settings.gameName;
+			}
+			else
+			{
+				titleText.text = "";
+				titleImg.sprite = uiTheme.global.titleImage;
+			}
+		}
+
+		public void ApplyGameStartTheme()
+		{
+			int platform = (int)erm.version.platformType;
+			
+			ApplyTitle(gameStartingUI.titleText[platform], gameStartingUI.titleImage[platform]);
 
 		}
 
 		private void Start()
 		{
-			SetPage(0);
+			SetPage(1);
+			erm = EndlessRunnerManager.instance;
 		}
 
 		public void SetPage(int pageIndex)

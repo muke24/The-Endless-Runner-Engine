@@ -11,25 +11,13 @@ namespace EndlessRunnerEngine
     {
         public LevelData levelData;
         public LevelTheme levelTheme;
+        public enum Mode { Endless, Custom }
 
-		[Serializable]
-        public class LevelData
-		{
-            public enum Difficulty { Easy, Normal, Hard }
-            [Tooltip("This is the difficulty level of this game level.")]
-            public Difficulty difficulty = Difficulty.Normal;
+        public float difficulty = 1f;
 
-			[SerializeField]
-            internal float obstacleSpacing = 10f;
+        [SerializeField]
+        internal float obstacleSpacing = 10f;
 
-            internal bool levelUsesCollectables = true;
-            internal Collectable[] collectables;
-
-        }
-
-        public class LevelTheme
-		{
-            
-		}
+        internal bool levelUsesCollectables = true;
     }
 }

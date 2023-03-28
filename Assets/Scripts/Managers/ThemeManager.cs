@@ -48,5 +48,20 @@ namespace EndlessRunnerEngine
 				public int[] toolTipTextSize;
 			}
 		}
+
+		public void ApplyUITheme()
+		{
+
+		}
+
+		public void ApplyUIThemeOnPageOnly(int pageIndex)
+		{
+
+		}
+
+		public void ApplyGameTheme()
+		{
+
+		}
 	}
 }
