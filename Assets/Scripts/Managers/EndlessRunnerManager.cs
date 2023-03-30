@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MyBox;
+using static UnityEngine.Diagnostics.Utils;
 
 namespace EndlessRunnerEngine
 {
@@ -36,7 +37,9 @@ namespace EndlessRunnerEngine
 
 		#region Variables
 		public static EndlessRunnerEngine.Player localPlayer;
+		public static RowMovement localRow;
 		public static Level currentLoadedLevel;
+		public static bool gameStarted = false;
 
 		[SerializeField]
 		internal Version version;
@@ -291,7 +294,8 @@ namespace EndlessRunnerEngine
 		/// </summary>
 		private void LateInitialise()
 		{
-
+			// Debugging
+			//StartEndlessGame(new GameObject());
 		}
 
 		/// <summary>
@@ -307,9 +311,29 @@ namespace EndlessRunnerEngine
 			UIManager.instance.ApplyUITheme();
 		}
 
-		public void StartEndlessGame()
+		/// <summary>
+		/// Starts the game given the selected level prefab
+		/// </summary>
+		/// <param name="level"></param>
+		public void StartEndlessGame(GameObject selectedLevel)
 		{
+			Debug.Log("Starting Game!");
+			RetrieveLocalRow(selectedLevel);
+		}
 
+		void RetrieveLocalRow(GameObject selectedLevel)
+		{
+			GameObject spawnedLevel = Instantiate(selectedLevel);
+
+			localRow = spawnedLevel.GetComponentInChildren<RowMovement>();
+
+			// Crash application if cannot find RowMovement script
+			if (localRow == null)
+			{
+				Debug.LogError("Unable to fetch the RowMovement script in the selected level prefab! Forcing crash...");
+				//ForceCrash(UnityEngine.Diagnostics.ForcedCrashCategory.FatalError);
+				UnityEngine.Application.Quit();
+			}
 		}
 		#endregion
 	}

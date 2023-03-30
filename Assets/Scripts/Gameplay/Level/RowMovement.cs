@@ -25,6 +25,22 @@ namespace EndlessRunnerEngine
 			internal Transform rowParent;
 
 			internal Row[] spawnedRows;
+
+			public Row[] backgroundRows;
+
+			public SpriteRenderer[] backgroundSprites;
+			public SpriteRenderer[] SideWallSprites;
+						
+			public float distanceLoggerSpeed = 0f;
+
+			[HideInInspector, Tooltip("Checks if this is the original background. Useful for resetting the game so it doesnt destroy this object.")]
+			public bool isFirstBackground = false; // Not functional yet
+
+			internal float currentBackgroundSpeed = 0f;
+
+			internal Vector3[] startPositions;
+
+			//private ObstacleGeneration[] obstacleParents;
 		}
 
 		[Serializable]
@@ -93,16 +109,19 @@ namespace EndlessRunnerEngine
 
 		private void Update()
 		{
-			MoveRows();
+			//MoveRows();
+			// Row movement is done via the player script
 		}
 
 		void MoveRows()
 		{
-			for (int i = 0; i < internalValues.spawnedRows.Length; i++)
+			if (EndlessRunnerManager.gameStarted)
 			{
+				for (int i = 0; i < internalValues.spawnedRows.Length; i++)
+				{
 
+				}
 			}
 		}
-
 	}
 }

@@ -37,25 +37,26 @@ namespace EndlessRunnerEngine
 
 			public enum ControlType { Keyboard, Touch, Gyroscope, ScreenButtons, Joystick, Camera }
 			[SerializeField, SearchableEnum]
-			public ControlType controlType = ControlType.Keyboard;
+			public ControlType selectedControl = ControlType.Keyboard;
 
 			public Player assignedPlayer { get; internal set; }
 
-			[ConditionalField(nameof(controlType), false, ControlType.Keyboard)]
+			#region Control Type Variables
+			[ConditionalField(nameof(selectedControl), false, ControlType.Keyboard)]
 			public KeyboardControls keyboardControls;
-			[ConditionalField(nameof(controlType), false, ControlType.Touch)]
+			[ConditionalField(nameof(selectedControl), false, ControlType.Touch)]
 			public TouchControls touchControls;
 
-			[ConditionalField(nameof(controlType), false, ControlType.Gyroscope)]
+			[ConditionalField(nameof(selectedControl), false, ControlType.Gyroscope)]
 			public GyroscopeControls gyroscopeControls;
 
-			[ConditionalField(nameof(controlType), false, ControlType.ScreenButtons)]
+			[ConditionalField(nameof(selectedControl), false, ControlType.ScreenButtons)]
 			public ScreenButtonControls screenButtonControls;
 
-			[ConditionalField(nameof(controlType), false, ControlType.Joystick)]
+			[ConditionalField(nameof(selectedControl), false, ControlType.Joystick)]
 			public JoystickControls joystickControls;
 
-			[ConditionalField(nameof(controlType), false, ControlType.Camera)]
+			[ConditionalField(nameof(selectedControl), false, ControlType.Camera)]
 			public CameraControls cameraControls;
 
 			[Serializable]
@@ -120,6 +121,44 @@ namespace EndlessRunnerEngine
 				[Tooltip("Using a camera to body track the player can cause jittery movement sometimes. This allows smoothing of the jitters.")]
 				public float cameraSmoothing;
 			}
+			#endregion
+
+		}
+
+		private float lastVertical;
+		public float Vertical()
+		{
+			float axis = lastVertical;
+			int playerId = EndlessRunnerManager.localPlayer.playerId;
+			Control playerControls = controls[playerId];
+
+			if (playerControls.selectedControl == Control.ControlType.Keyboard)
+			{
+				var render = EndlessRunnerManager.instance.render;
+
+				// Game Orientation
+				var down = EndlessRunnerManager.Render.GameDirection2D.Down;
+				var up = EndlessRunnerManager.Render.GameDirection2D.Up;
+
+				// If game orientation is vertical
+				if (render.direction2D == up || render.direction2D == down)
+				{
+					if (Input.GetKey(playerControls.keyboardControls.forwardButton))
+					{
+						float curVert = lastVertical + Time.deltaTime;
+						return curVert;
+					}
+				}
+				// If game orientation is horizontal
+				else
+				{
+
+				}
+
+				return axis;
+			}
+			// This is here for now to remove error
+			return 0;
 		}
 	}
 }
