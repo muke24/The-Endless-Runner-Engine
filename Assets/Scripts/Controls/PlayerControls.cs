@@ -62,6 +62,9 @@ namespace EndlessRunnerEngine
 			[Serializable]
 			public class KeyboardControls
 			{
+				public AnimationCurve axisCurve;
+				public float axisDeadZone = 0.05f;
+
 				[SearchableEnum]
 				public KeyCode forwardButton = KeyCode.UpArrow;
 				[SearchableEnum]
@@ -112,7 +115,7 @@ namespace EndlessRunnerEngine
 			[Serializable]
 			public class JoystickControls
 			{
-				
+
 			}
 
 			[Serializable]
@@ -126,10 +129,10 @@ namespace EndlessRunnerEngine
 		}
 
 		private float lastVertical;
-		public float Vertical()
+		public float Vertical(int playerId)
 		{
 			float axis = lastVertical;
-			int playerId = EndlessRunnerManager.localPlayer.playerId;
+			//int playerId = EndlessRunnerManager.localPlayer.playerId;
 			Control playerControls = controls[playerId];
 
 			if (playerControls.selectedControl == Control.ControlType.Keyboard)
@@ -140,12 +143,32 @@ namespace EndlessRunnerEngine
 				var down = EndlessRunnerManager.Render.GameDirection2D.Down;
 				var up = EndlessRunnerManager.Render.GameDirection2D.Up;
 
+				float curVert = 0;
+
 				// If game orientation is vertical
 				if (render.direction2D == up || render.direction2D == down)
 				{
 					if (Input.GetKey(playerControls.keyboardControls.forwardButton))
 					{
-						float curVert = lastVertical + Time.deltaTime;
+						curVert = lastVertical + playerControls.keyboardControls.axisCurve.Evaluate(lastVertical) * Time.deltaTime;
+						Debug.Log("Forward axis is currently: " + curVert);
+
+						return curVert;
+					}
+					else if (lastVertical > playerControls.keyboardControls.axisDeadZone)
+					{
+
+						curVert = lastVertical - playerControls.keyboardControls.axisCurve.Evaluate(lastVertical) * Time.deltaTime;
+						Debug.Log("Forward axis is currently: " + curVert);
+
+						return curVert;
+					}
+					else
+					{
+						lastVertical = 0f;
+						curVert = 0f;
+						Debug.Log("Forward axis is currently: " + curVert);
+
 						return curVert;
 					}
 				}

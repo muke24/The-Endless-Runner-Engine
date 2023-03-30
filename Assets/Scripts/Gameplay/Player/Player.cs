@@ -41,47 +41,14 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		public class Model
 		{
-			//
-			//private EndlessRunnerManager manager
-			//{
-			//	get
-			//	{
-			//		return FindObjectOfType<EndlessRunnerManager>();
-			//	}
-			//}
+			[Tooltip("Player sprites must be in order of this: turning left, forward sprite, turning right.")]
+			public Sprite[] playerSprites;
 
-			//[ConditionalField(nameof(manager.render.renderType), false, EndlessRunnerManager.Render.RenderType.TwoDimentional)]
-			[Tooltip("If game is 2D")]
-			public TwoDimentional twoDimentional;
-			[Tooltip("If game is 3D")]
-			public ThreeDimentional threeDimentional;
-
-			[Serializable]
-			public class TwoDimentional
+			public Shadow shadow;
+			public class Shadow
 			{
-				//[ConditionalField(nameof(EndlessRunnerManager.editorInstance.render.renderType), false, EndlessRunnerManager.Render.RenderType.ThreeDimentional)]
-				public GameObject playerModel2D;
-
-				[Tooltip("Player sprites must be in order of this: turning left, forward sprite, turning right.")]
-				public Sprite[] playerSprites;
-
-				public bool useShadow = false;
-
-				public Shadow shadow;
-				public class Shadow
-				{
-					public enum ShadowType { Round, FromPlayerSprite}
-					public ShadowType type = ShadowType.Round;
-				}
-			}
-
-			[Serializable]
-			public class ThreeDimentional
-			{
-				//[ConditionalField(nameof(EndlessRunnerManager.editorInstance.render.renderType), false, EndlessRunnerManager.Render.RenderType.TwoDimentional)]
-				public GameObject playerModel3D;
-
-				
+				public enum ShadowType { Round, FromPlayerSprite, None }
+				public ShadowType type = ShadowType.Round;
 			}
 		}
 
@@ -109,8 +76,10 @@ namespace EndlessRunnerEngine
 		#region Script movement variables
 		private float horizontalSpeedAngleEffector;
 		private float curAngle;
-		private float curScaledAngle;
+		//private float curScaledAngle;
 		private float lastPos;
+		private float spriteAngle;
+		private float spriteAngleSensitivity;
 		#endregion
 
 		void Awake()
@@ -153,70 +122,70 @@ namespace EndlessRunnerEngine
 		{
 			float keyboardPos = lastPos;
 
-			// Down arrow
-			if (KeyboardControls.instance.keys[playerID - 1].Down())
-			{
-				if (keyboardPos > transform.position.x + 0.1f && keyboardPos < transform.position.x - 0.1f)
-				{
-					keyboardPos = transform.position.x;
-				}
-				else if (keyboardPos > transform.position.x)
-				{
-					keyboardPos -= keyboardAngleSensitivity * Time.deltaTime;
-				}
-				else if (keyboardPos < transform.position.x)
-				{
-					keyboardPos += keyboardAngleSensitivity * Time.deltaTime;
-				}
-			}
+			//// Down arrow
+			//if (PlayerControls.instance.Vertical(playerId) > 0)
+			//{
+			//	if (keyboardPos > transform.position.x + 0.1f && keyboardPos < transform.position.x - 0.1f)
+			//	{
+			//		keyboardPos = transform.position.x;
+			//	}
+			//	else if (keyboardPos > transform.position.x)
+			//	{
+			//		keyboardPos -= keyboardAngleSensitivity * Time.deltaTime;
+			//	}
+			//	else if (keyboardPos < transform.position.x)
+			//	{
+			//		keyboardPos += keyboardAngleSensitivity * Time.deltaTime;
+			//	}
+			//}
 
-			// Left arrow
-			if (KeyboardControls.instance.keys[playerID - 1].Left())
-			{
-				if (keyboardPos > -maxKeyboardPos)
-				{
-					keyboardPos -= keyboardAngleSensitivity * Time.deltaTime;
-				}
-			}
+			//// Left arrow
+			//if (KeyboardControls.instance.keys[playerID - 1].Left())
+			//{
+			//	if (keyboardPos > -maxKeyboardPos)
+			//	{
+			//		keyboardPos -= keyboardAngleSensitivity * Time.deltaTime;
+			//	}
+			//}
 
-			// Right arrow
-			if (KeyboardControls.instance.keys[playerID - 1].Right())
-			{
-				if (keyboardPos < maxKeyboardPos)
-				{
-					keyboardPos += keyboardAngleSensitivity * Time.deltaTime;
-				}
-			}
+			//// Right arrow
+			//if (KeyboardControls.instance.keys[playerID - 1].Right())
+			//{
+			//	if (keyboardPos < maxKeyboardPos)
+			//	{
+			//		keyboardPos += keyboardAngleSensitivity * Time.deltaTime;
+			//	}
+			//}
 
-			// Down & Left arrow
-			if (KeyboardControls.instance.keys[playerID - 1].LeftHalf())
-			{
-				if (keyboardPos > -maxKeyboardPos)
-				{
-					keyboardPos -= (keyboardAngleSensitivity / 2) * Time.deltaTime;
-				}
-			}
+			//// Down & Left arrow
+			//if (KeyboardControls.instance.keys[playerID - 1].LeftHalf())
+			//{
+			//	if (keyboardPos > -maxKeyboardPos)
+			//	{
+			//		keyboardPos -= (keyboardAngleSensitivity / 2) * Time.deltaTime;
+			//	}
+			//}
 
-			// Down & Right arrow
-			if (KeyboardControls.instance.keys[playerID - 1].RightHalf())
-			{
-				if (keyboardPos < maxKeyboardPos)
-				{
-					keyboardPos += (keyboardAngleSensitivity / 2) * Time.deltaTime;
-				}
-			}
+			//// Down & Right arrow
+			//if (KeyboardControls.instance.keys[playerID - 1].RightHalf())
+			//{
+			//	if (keyboardPos < maxKeyboardPos)
+			//	{
+			//		keyboardPos += (keyboardAngleSensitivity / 2) * Time.deltaTime;
+			//	}
+			//}
 
-			lastPos = keyboardPos;
+			//lastPos = keyboardPos;
 
-			float planeAngleLerped = Mathf.Lerp(planeLastAngle, (keyboardPos - transform.position.x) * kinectAngleSensitivity, planeAngleSmoothing * Time.deltaTime);
+			//float planeAngleLerped = Mathf.Lerp(planeLastAngle, (keyboardPos - transform.position.x) * kinectAngleSensitivity, planeAngleSmoothing * Time.deltaTime);
 
-			rawPlaneAngle = (keyboardPos - transform.position.x) * kinectAngleSensitivity;
-			planeAngle = planeAngleLerped;
-			planeLastAngle = planeAngleLerped;
+			//rawPlaneAngle = (keyboardPos - transform.position.x) * kinectAngleSensitivity;
+			//planeAngle = planeAngleLerped;
+			//planeLastAngle = planeAngleLerped;
 
 			//Debug.Log(EziCode.LogString(name) + "Plane angle is: " + planeAngle + ". Plane Position is: " + plane.transform.position.x + ". User Position is: " + keyboardPos);
 
-			PlaneAngleBoundaries();
+			//AngleBoundaries();
 		}
 
 		/// <summary>
@@ -237,10 +206,11 @@ namespace EndlessRunnerEngine
 					horizontalSpeedAngleEffector = 10f;
 				}
 
-				float xPos = transform.position.x + (curAngle / horizontalSpeedAngleEffector) * Time.deltaTime;
+				//float xPos = transform.position.x + (curAngle / horizontalSpeedAngleEffector) * Time.deltaTime;
 
-				// Scale angle to frame animation count for plane
-				scaledPlaneAngle = (int)EziCode.Scale(-90, 90, -planeAnimFrameCount, planeAnimFrameCount, planeAngle * spriteAngleSensitivity);
+				// Scales the angle to the frame animation count for the player
+				int planeAnimFrameCount = (model.playerSprites.Length / 2) - 1;
+				spriteAngle = (int)Scale(-90, 90, -planeAnimFrameCount, planeAnimFrameCount, curAngle * spriteAngleSensitivity);
 			}
 		}
 
@@ -257,6 +227,16 @@ namespace EndlessRunnerEngine
 			{
 				curAngle = -90f;
 			}
+		}
+
+		private static float Scale(float OldMin, float OldMax, float NewMin, float NewMax, float OldValue)
+		{
+
+			float OldRange = (OldMax - OldMin);
+			float NewRange = (NewMax - NewMin);
+			float NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin;
+
+			return (NewValue);
 		}
 	}
 }
