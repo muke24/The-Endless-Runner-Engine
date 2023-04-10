@@ -47,7 +47,7 @@ namespace EndlessRunnerEngine
 		public class Customisation
 		{
 			public Row[] rowsThatCanSpawn;
-			public int amountOfRowsToSpawn = 5;
+			//public int amountOfRowsToSpawn = 5;
 		}
 
 		private void Awake()
@@ -78,22 +78,24 @@ namespace EndlessRunnerEngine
 			#endregion
 
 			#region Spawn new rows
-			internalValues.spawnedRows = new Row[customisation.amountOfRowsToSpawn];
+			int rowsToSpawn = EndlessRunnerManager.instance.environment.rowsToSpawn;
 
-			for (int i = 0; i < customisation.amountOfRowsToSpawn; i++)
+			internalValues.spawnedRows = new Row[rowsToSpawn];
+
+			for (int i = 0; i < rowsToSpawn; i++)
 			{
 				//internalValues.spawnedRows[i] = Instantiate(customisation.rowsThatCanSpawn[UnityEngine.Random.Range(0, customisation.rowsThatCanSpawn.Length)]);
 
-				if (customisation.amountOfRowsToSpawn > customisation.rowsThatCanSpawn.Length)
+				if (rowsToSpawn > customisation.rowsThatCanSpawn.Length)
 				{
 
 				}
-				else if (customisation.amountOfRowsToSpawn < customisation.rowsThatCanSpawn.Length)
+				else if (rowsToSpawn < customisation.rowsThatCanSpawn.Length)
 				{
 					// Set this so it spawns the rest in another for loop
-					if (i == customisation.amountOfRowsToSpawn - 1) // If last obstacle in obstacles to spawn is being spawned but more obstacles are to spawn
+					if (i == rowsToSpawn - 1) // If last obstacle in obstacles to spawn is being spawned but more obstacles are to spawn
 					{
-						for (int x = 0; x < (customisation.rowsThatCanSpawn.Length - customisation.amountOfRowsToSpawn); x++)
+						for (int x = 0; x < (customisation.rowsThatCanSpawn.Length - rowsToSpawn); x++)
 						{
 
 						}

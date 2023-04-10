@@ -285,7 +285,7 @@ namespace EndlessRunnerEngine
 		private void Initialise()
 		{
 			StartCoroutine(SlowUpdateCaller());
-
+			CheckScreenType();
 			//version.platformScreensCount = Enum.GetValues(typeof(Version.PlatformScreens)).Length;
 		}
 
@@ -295,7 +295,8 @@ namespace EndlessRunnerEngine
 		private void LateInitialise()
 		{
 			// Debugging
-			//StartEndlessGame(new GameObject());
+			//StartGame(new GameObject());
+			SetupUI();
 		}
 
 		/// <summary>
@@ -304,6 +305,20 @@ namespace EndlessRunnerEngine
 		private void SlowUpdate()
 		{
 
+		}
+
+		void CheckScreenType()
+		{
+			// If landscape
+			if (Screen.currentResolution.width > Screen.currentResolution.height)
+			{
+				version.platformScreens = Version.PlatformScreens.Landscape;
+			}
+			// If portraite
+			else
+			{
+				version.platformScreens = Version.PlatformScreens.Portrait;
+			}
 		}
 
 		private void SetupUI()
@@ -315,7 +330,7 @@ namespace EndlessRunnerEngine
 		/// Starts the game given the selected level prefab
 		/// </summary>
 		/// <param name="level"></param>
-		public void StartEndlessGame(GameObject selectedLevel)
+		public void StartGame(GameObject selectedLevel)
 		{
 			Debug.Log("Starting Game!");
 			RetrieveLocalRow(selectedLevel);

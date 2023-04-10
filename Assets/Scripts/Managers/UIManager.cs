@@ -125,6 +125,7 @@ namespace EndlessRunnerEngine
 			{
 				instance = this;
 			}
+			erm = EndlessRunnerManager.instance;
 		}
 
 		void PlatformSetup()
@@ -143,6 +144,11 @@ namespace EndlessRunnerEngine
 
 		public void ApplyUITheme()
 		{
+			if (erm == null)
+			{
+				erm = EndlessRunnerManager.instance;
+			}
+
 			int platform = (int)erm.version.platformType;
 
 			
@@ -190,8 +196,9 @@ namespace EndlessRunnerEngine
 		private void Start()
 		{
 			SetPage(1);
-			erm = EndlessRunnerManager.instance;
+			
 		}
+
 
 		public void SetPage(int pageIndex)
 		{
