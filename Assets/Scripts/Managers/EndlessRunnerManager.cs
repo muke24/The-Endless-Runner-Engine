@@ -68,7 +68,7 @@ namespace EndlessRunnerEngine
 			[Tooltip("For business use. Remove this when on asset store.")]
 			internal GameVersion gameVersion;
 
-			public enum PlatformScreens { Landscape, Portrait }
+			public enum PlatformScreens { Landscape = 1, Portrait = 0 }
 			[SerializeField]
 			public PlatformScreens platformScreens;
 			public int platformScreensCount

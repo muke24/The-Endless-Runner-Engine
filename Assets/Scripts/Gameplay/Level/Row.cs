@@ -8,27 +8,35 @@ namespace EndlessRunnerEngine
 {
     public class Row : MonoBehaviour
     {
-        internal float rowVerticalSize = 5f;
+		#region Old
+		//      //internal float rowVerticalSize = 5f;
 
-		internal CustomSpawner[] customSpawners;
+		//internal CustomSpawner[] customSpawners;
 
-		private void Start()
-		{
-			FindCustomSpawners();
-			RegenerateCustomSpawners();
-		}
+		//private void Start()
+		//{
+		//	FindCustomSpawners();
+		//	RegenerateCustomSpawners();
+		//}
 
-		void FindCustomSpawners()
-		{
-			customSpawners = GetComponentsInChildren<CustomSpawner>();
-		}
+		//void FindCustomSpawners()
+		//{
+		//	customSpawners = GetComponentsInChildren<CustomSpawner>();
+		//}
 
-		internal void RegenerateCustomSpawners()
-		{
-			for (int i = 0; i < customSpawners.Length; i++)
-			{
-				customSpawners[i].Generate();
-			}
-		}
-    }
+		//internal void RegenerateCustomSpawners()
+		//{
+		//	for (int i = 0; i < customSpawners.Length; i++)
+		//	{
+		//		customSpawners[i].Generate();
+		//	}
+		//} 
+		#endregion
+		[SerializeField]
+		internal Transform leftSidewallParent;
+		[SerializeField]
+		internal Transform rightSidewallParent;
+		[SerializeField]
+		internal Transform backgroundParent;
+	}
 }

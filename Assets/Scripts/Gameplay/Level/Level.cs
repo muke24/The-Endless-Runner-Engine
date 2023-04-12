@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace EndlessRunnerEngine
 {
@@ -16,27 +17,42 @@ namespace EndlessRunnerEngine
 			[SerializeField, Tooltip("What game mode is this level using?")]
 			internal GameMode gameMode = GameMode.Endless;
 
-			public int levelCount = 8;
-			public float colourChangeSpeed = 5f;
+			[SerializeField]
+			internal int levelCount = 8;
+			[SerializeField]
+			internal float colourChangeSpeed = 5f;
+			[SerializeField]
+			internal int rowStartPoint = -2;
 
+			[SerializeField]
+			internal Vector2 rowSize;
+			[SerializeField]
+			internal float sidewallWidthMultiplier = 3;
+
+			internal RowMovement rowParent;
+
+			[SerializeField]
+			internal bool rotateObjectsToScreenOrientation = true;
+		}
+
+		[Serializable]
+		internal class SpawnableObjects
+		{
 			[SerializeField]
 			internal GameObject row;
-
 			[SerializeField]
-			internal Transform rowParent;
+			internal GameObject sidewall;
+			[SerializeField]
+			internal GameObject background;
+			[SerializeField]
+			internal GameObject detail; // Window in this case
+			[SerializeField]
+			internal GameObject obstacle;
 		}
 
 		[Serializable]
 		internal class Theme
 		{
-			#region Sprites
-			[Header("Sprites")]
-			public Sprite[] obstacleSprites;
-			public Sprite[] backgroundSprites;
-			public Sprite[] sidewallSprites;
-			public Sprite[] detailSprites;
-			#endregion
-
 			#region Colours
 			[Header("Colours")]
 			public Color[] backgroundColours;
@@ -52,13 +68,12 @@ namespace EndlessRunnerEngine
 			#endregion
 		}
 
-		[Serializable]
 		internal class Renderers
 		{
-			public SpriteRenderer[] backgroundRenderers;
-			public SpriteRenderer[] obstacleRenderers;
-			public SpriteRenderer[] sidewallRenderers;
-			public SpriteRenderer[] detailRenderers;
+			public List<SpriteRenderer> backgroundRenderers;
+			public List<SpriteRenderer> obstacleRenderers;
+			public List<SpriteRenderer> sidewallRenderers;
+			public List<SpriteRenderer> detailRenderers;
 		}
 
 		[SerializeField]
@@ -67,14 +82,30 @@ namespace EndlessRunnerEngine
 		private Theme levelTheme;
 		[SerializeField]
 		private Renderers levelRenderers;
+		[SerializeField]
+		internal SpawnableObjects spawnableObjects;
 
 		internal int currentLevel = 0;
+
+		[SerializeField]
+		internal List<Row> rows;
+		[SerializeField]
+		internal List<GameObject> sidewalls;
+		[SerializeField]
+		internal List<GameObject> backgrounds;
+		[SerializeField]
+		internal List<GameObject> details;
+		[SerializeField]
+		internal List<GameObject> obstacles;
+
 
 		private Light2D levelLighting;
 
 		private void Start()
 		{
+			levelData.rowParent = GetComponentInChildren<RowMovement>();
 			levelLighting = GetComponentInChildren<Light2D>();
+			LoadLevel();
 		}
 
 		public void ApplyLevelColours()
@@ -88,7 +119,7 @@ namespace EndlessRunnerEngine
 		{
 			while (true)
 			{
-				int length = levelRenderers.backgroundRenderers.Length;
+				int length = levelRenderers.backgroundRenderers.Count;
 
 				if (length != 0)
 				{
@@ -117,7 +148,7 @@ namespace EndlessRunnerEngine
 		{
 			while (true)
 			{
-				int length = levelRenderers.obstacleRenderers.Length;
+				int length = levelRenderers.obstacleRenderers.Count;
 
 				if (length != 0)
 				{
@@ -146,7 +177,7 @@ namespace EndlessRunnerEngine
 		{
 			while (true)
 			{
-				int length = levelRenderers.detailRenderers.Length;
+				int length = levelRenderers.detailRenderers.Count;
 
 				if (length != 0)
 				{
@@ -173,7 +204,105 @@ namespace EndlessRunnerEngine
 
 		public void LoadLevel()
 		{
+			if (levelData.rowParent.transform.childCount > 0)
+			{
+				for (int i = 0; i < levelData.rowParent.transform.childCount; i++)
+				{
+					Debug.Log("Some rows already exist. Deleting them now and spawning new rows.");
+					Destroy(levelData.rowParent.transform.GetChild(i).gameObject);
+				}
+			}
 
+			rows = new List<Row>();
+
+			for (int i = 0; i < EndlessRunnerManager.instance.environment.rowsToSpawn; i++)
+			{
+				SpawnRow();
+			}
+		}
+
+		void SpawnRow()
+		{
+			Row row = Instantiate(spawnableObjects.row.GetComponent<Row>(), levelData.rowParent.transform);
+
+			rows.Add(row);
+
+			SpawnBackgrounds(row);
+			SpawnSidewalls(row);
+			RepositionAllRows();
+		}
+
+		void SpawnSidewalls(Row row)
+		{
+			for (int i = 0; i < 2; i++)
+			{
+				var erm = EndlessRunnerManager.instance;
+
+				Vector3 position = Vector3.zero;
+				Vector3 rotation = Vector3.zero;
+
+				if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
+				{
+					position = new Vector3((levelData.rowSize.x / 2) + ((spawnableObjects.sidewall.GetComponent<SpriteRenderer>().size.x * 10 / 2) * levelData.sidewallWidthMultiplier), 0, 0);
+				}
+				else
+				{
+					position = new Vector3(0, (levelData.rowSize.y + spawnableObjects.sidewall.GetComponent<SpriteRenderer>().size.y), 0);
+
+					if (levelData.rotateObjectsToScreenOrientation)
+					{
+						rotation = new Vector3(0, 0, 90);
+					}
+				}
+
+				// Left
+				if (i == 0)
+				{
+					GameObject sidewall = Instantiate(spawnableObjects.sidewall, -position, Quaternion.Euler(rotation), row.leftSidewallParent);
+
+					sidewalls.Add(sidewall);
+
+					var rend = sidewall.GetComponent<SpriteRenderer>();
+					// Apply background size
+					rend.size = levelData.rowSize / 10 * new Vector2(levelData.sidewallWidthMultiplier, 1);
+					rend.sortingOrder = 0;
+				}
+				// Right
+				else if (i == 1)
+				{
+					GameObject sidewall = Instantiate(spawnableObjects.sidewall, position, Quaternion.Euler(rotation), row.rightSidewallParent);
+					sidewalls.Add(sidewall);
+
+					var rend = sidewall.GetComponent<SpriteRenderer>();
+					// Apply background size
+					rend.size = levelData.rowSize / 10 * new Vector2(levelData.sidewallWidthMultiplier, 1);
+					rend.sortingOrder = 0;
+				}
+			}
+		}
+
+		void SpawnBackgrounds(Row row)
+		{
+			GameObject background = Instantiate(spawnableObjects.background, row.backgroundParent);
+
+			backgrounds.Add(background);
+
+			var rend = background.GetComponent<SpriteRenderer>();
+			// Apply background size
+			rend.size = levelData.rowSize / 10;
+			rend.sortingOrder = 1;
+		}
+
+		void RepositionAllRows()
+		{
+			// Add splitscreen code here
+
+			// Add screen orientation code here
+
+			for (int i = 0; i < rows.Count; i++)
+			{
+				rows[i].transform.position = new Vector3(0, levelData.rowSize.y * (-i - levelData.rowStartPoint), 0);
+			}
 		}
 	}
 }

@@ -5556,8 +5556,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e55575b4f5b955439016c8d3e2ba920, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiScale: 1
+  uiTheme: {fileID: 0}
   pages:
-    currentPage: 0
     gamePages:
     - {fileID: 289534052}
     - {fileID: 1647932322}
@@ -5566,18 +5567,12 @@ MonoBehaviour:
     - {fileID: 2061549398}
     - {fileID: 1407698956}
     - {fileID: 242203797}
-  startupUI:
-    companyText:
-    - {fileID: 1606426916}
-  menuUI:
-    titleText:
-    - {fileID: 938856576}
-    titleImage:
-    - {fileID: 1769250782}
-    clickToPlayText:
-    - {fileID: 190352981}
-    copyrightText:
-    - {fileID: 582657297}
+  currentPage: 0
+  mainMenuUI:
+    titleText: []
+    titleImage: []
+    clickToPlayText: []
+    copyrightText: []
   gameStartingUI:
     countdownTimerText:
     - {fileID: 1136147226}
@@ -5588,6 +5583,7 @@ MonoBehaviour:
     - {fileID: 1234771701}
     tooltipText:
     - {fileID: 60433795}
+    titleImage: []
   inGameUI:
     scoreText:
     - {fileID: 1497915155}
@@ -5597,8 +5593,6 @@ MonoBehaviour:
     collectableRefText: []
     collectableRefImg: []
   deathUI:
-    toolTipText:
-    - {fileID: 843728269}
     scoreText:
     - {fileID: 1762551590}
     scoreRefText:
@@ -5654,8 +5648,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controls:
   - name: 'Player '
-    controlType: 0
+    selectedControl: 0
     keyboardControls:
+      axisCurve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      axisDeadZone: 0.05
       forwardButton: 115
       backwardButton: 119
       leftButton: 97
@@ -5729,7 +5730,6 @@ MonoBehaviour:
     direction3D: 2
     quality: 2
   game:
-    gameName: Paper Plane
     uiTheme: {fileID: 0}
     playType: 0
   scoring:
@@ -5744,10 +5744,6 @@ MonoBehaviour:
     localPlayer: {fileID: 0}
     spawnPlayerDuringStartCountdown: 1
     secondsToSpawnPlayerDuringCountdown: 2
-    floatiness: 1
-    sideSpeed: 1
-    forwardSpeed: 1
-    generalSpeed: 1
   environment:
     rowsToSpawn: 6
   application:

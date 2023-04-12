@@ -67,15 +67,15 @@ namespace EndlessRunnerEngine
 
 		private void LateInitialise()
 		{
-			#region Destroy any rows that are already in scene
-			if (internalValues.rowParent.childCount > 0)
-			{
-				for (int i = 0; i < internalValues.rowParent.childCount; i++)
-				{
-					Destroy(internalValues.rowParent.GetChild(i).gameObject);
-				}
-			}
-			#endregion
+			//#region Destroy any rows that are already in scene
+			//if (internalValues.rowParent.childCount > 0)
+			//{
+			//	for (int i = 0; i < internalValues.rowParent.childCount; i++)
+			//	{
+			//		Destroy(internalValues.rowParent.GetChild(i).gameObject);
+			//	}
+			//}
+			//#endregion
 
 			#region Spawn new rows
 			int rowsToSpawn = EndlessRunnerManager.instance.environment.rowsToSpawn;
