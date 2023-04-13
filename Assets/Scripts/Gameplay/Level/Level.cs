@@ -13,6 +13,9 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		internal class Data
 		{
+			[SerializeField]
+			internal bool rotateObjectsToScreenOrientation = true;
+
 			internal enum GameMode { Endless, Race, Level }
 			[SerializeField, Tooltip("What game mode is this level using?")]
 			internal GameMode gameMode = GameMode.Endless;
@@ -23,16 +26,11 @@ namespace EndlessRunnerEngine
 			internal float colourChangeSpeed = 5f;
 			[SerializeField]
 			internal int rowStartPoint = -2;
-
-			[SerializeField]
-			internal Vector2 rowSize;
 			[SerializeField]
 			internal float sidewallWidthMultiplier = 3;
-
-			internal RowMovement rowParent;
-
 			[SerializeField]
-			internal bool rotateObjectsToScreenOrientation = true;
+			internal Vector2 rowSize;
+			internal RowMovement rowParent;
 		}
 
 		[Serializable]
@@ -284,7 +282,15 @@ namespace EndlessRunnerEngine
 
 					var rend = sidewall.GetComponent<SpriteRenderer>();
 					// Apply background size
-					rend.size = levelData.rowSize / 10 * new Vector2(levelData.sidewallWidthMultiplier, 1);
+					var erm = EndlessRunnerManager.instance;
+					if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
+					{
+						rend.size = levelData.rowSize / 10 * new Vector2(levelData.sidewallWidthMultiplier, 1);
+					}
+					else
+					{
+						rend.size = levelData.rowSize / 10 * new Vector2(1, levelData.sidewallWidthMultiplier);
+					}
 					rend.sortingOrder = 0;
 				}
 				// Right
@@ -309,7 +315,15 @@ namespace EndlessRunnerEngine
 
 					var rend = sidewall.GetComponent<SpriteRenderer>();
 					// Apply background size
-					rend.size = levelData.rowSize / 10 * new Vector2(levelData.sidewallWidthMultiplier, 1);
+					var erm = EndlessRunnerManager.instance;
+					if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
+					{
+						rend.size = levelData.rowSize / 10 * new Vector2(levelData.sidewallWidthMultiplier, 1);
+					}
+					else
+					{
+						rend.size = levelData.rowSize / 10 * new Vector2(1, levelData.sidewallWidthMultiplier);
+					}
 					rend.sortingOrder = 0;
 				}
 			}
@@ -333,11 +347,12 @@ namespace EndlessRunnerEngine
 			// Landscape positioning
 			else
 			{
-				position = new Vector3(0, (levelData.rowSize.y / 2) + ((spawnableObjects.sidewall.GetComponent<SpriteRenderer>().size.y * 10) / 2), 0);
+				float sidewallSize = (sidewall.GetComponent<SpriteRenderer>().size.y * 5);
+				position = new Vector3(0, (levelData.rowSize.y / 2) + (sidewallSize), 0);
 
 				if (levelData.rotateObjectsToScreenOrientation)
 				{
-					rotation = new Vector3(0, 0, 90);
+					//rotation = new Vector3(0, 0, 90);
 				}
 
 				//Debug.Log("Calculated sidewall positions (Landscape)");
@@ -345,8 +360,8 @@ namespace EndlessRunnerEngine
 				return new Vector2[] { position, rotation };
 			}
 
-			Debug.LogError("Failed to reposition sidewalls!");
-			return new Vector2[] { position, rotation };
+			//Debug.LogError("Failed to reposition sidewalls!");
+			//return new Vector2[] { position, rotation };
 		}
 
 		void SpawnBackgrounds(Row row, bool start)
@@ -374,10 +389,20 @@ namespace EndlessRunnerEngine
 			// Add splitscreen code here
 
 			// Add screen orientation code here
-
-			for (int i = 0; i < rows.Count; i++)
+			var erm = EndlessRunnerManager.instance;
+			if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
 			{
-				rows[i].transform.position = new Vector3(0, levelData.rowSize.y * (-i - levelData.rowStartPoint), 0);
+				for (int i = 0; i < rows.Count; i++)
+				{
+					rows[i].transform.position = new Vector3(0, levelData.rowSize.y * (-i - levelData.rowStartPoint), 0);
+				}
+			}
+			else
+			{
+				for (int i = 0; i < rows.Count; i++)
+				{
+					rows[i].transform.position = new Vector3(levelData.rowSize.x * (-i - levelData.rowStartPoint), 0, 0);
+				}
 			}
 		}
 	}

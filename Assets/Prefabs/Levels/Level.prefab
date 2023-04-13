@@ -212,13 +212,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3472b31b3bd5de5429414e4fda08853b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debugging:
+    applyChangesAtRuntime: 0
   levelData:
+    rotateObjectsToScreenOrientation: 1
     gameMode: 0
     levelCount: 8
     colourChangeSpeed: 5
+    rowStartPoint: -1
+    sidewallWidthMultiplier: 6
     rowSize: {x: 5.75, y: 10}
-    rowParent: {fileID: 8374643793513694671}
-    rotateObjectsToScreenOrientation: 1
   levelTheme:
     backgroundColours:
     - {r: 0.7176471, g: 0.3019608, b: 0.07058824, a: 0}

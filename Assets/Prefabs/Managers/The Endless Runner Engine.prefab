@@ -5745,7 +5745,7 @@ MonoBehaviour:
     spawnPlayerDuringStartCountdown: 1
     secondsToSpawnPlayerDuringCountdown: 2
   environment:
-    rowsToSpawn: 6
+    rowsToSpawn: 3
   application:
     useVsync: 1
     targetFps: 60
