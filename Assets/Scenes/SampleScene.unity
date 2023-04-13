@@ -685,12 +685,12 @@ PrefabInstance:
     - target: {fileID: 3648344107236399487, guid: 4ba7e798f58ca97408bb0b0aa8b46151,
         type: 3}
       propertyPath: debugging.applyChangesAtRuntime
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3648344107236399487, guid: 4ba7e798f58ca97408bb0b0aa8b46151,
         type: 3}
       propertyPath: levelData.sidewallWidthMultiplier
-      value: 1
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ba7e798f58ca97408bb0b0aa8b46151, type: 3}
