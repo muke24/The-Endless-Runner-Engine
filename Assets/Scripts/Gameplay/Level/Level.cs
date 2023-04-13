@@ -27,6 +27,8 @@ namespace EndlessRunnerEngine
 			[SerializeField]
 			internal Vector2 rowSize;
 			[SerializeField]
+			internal float sidewallWidth = 5.75f;
+			[SerializeField]
 			internal float sidewallWidthMultiplier = 3;
 
 			internal RowMovement rowParent;
@@ -76,6 +78,15 @@ namespace EndlessRunnerEngine
 			public List<SpriteRenderer> detailRenderers;
 		}
 
+		[Serializable]
+		private class Debugging
+		{
+			[SerializeField]
+			internal bool applyChangesAtRuntime = false;
+		}
+
+		[SerializeField]
+		private Debugging debugging;
 		[SerializeField]
 		private Data levelData;
 		[SerializeField]
@@ -106,6 +117,19 @@ namespace EndlessRunnerEngine
 			levelData.rowParent = GetComponentInChildren<RowMovement>();
 			levelLighting = GetComponentInChildren<Light2D>();
 			LoadLevel();
+		}
+
+		private void Update()
+		{
+			if (debugging.applyChangesAtRuntime)
+			{
+				for (int i = 0; i < EndlessRunnerManager.instance.environment.rowsToSpawn; i++)
+				{
+					SpawnBackgrounds(rows[i], false);
+					SpawnSidewalls(rows[i], false);
+					RepositionAllRows();
+				}
+			}
 		}
 
 		public void ApplyLevelColours()
@@ -227,40 +251,34 @@ namespace EndlessRunnerEngine
 
 			rows.Add(row);
 
-			SpawnBackgrounds(row);
-			SpawnSidewalls(row);
+			SpawnBackgrounds(row, true);
+			SpawnSidewalls(row, true);
 			RepositionAllRows();
 		}
 
-		void SpawnSidewalls(Row row)
+		void SpawnSidewalls(Row row, bool start)
 		{
+
+
 			for (int i = 0; i < 2; i++)
 			{
-				var erm = EndlessRunnerManager.instance;
-
-				Vector3 position = Vector3.zero;
-				Vector3 rotation = Vector3.zero;
-
-				if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
-				{
-					position = new Vector3((levelData.rowSize.x / 2) + ((spawnableObjects.sidewall.GetComponent<SpriteRenderer>().size.x * 10 / 2) * levelData.sidewallWidthMultiplier), 0, 0);
-				}
-				else
-				{
-					position = new Vector3(0, (levelData.rowSize.y + spawnableObjects.sidewall.GetComponent<SpriteRenderer>().size.y), 0);
-
-					if (levelData.rotateObjectsToScreenOrientation)
-					{
-						rotation = new Vector3(0, 0, 90);
-					}
-				}
-
 				// Left
 				if (i == 0)
 				{
-					GameObject sidewall = Instantiate(spawnableObjects.sidewall, -position, Quaternion.Euler(rotation), row.leftSidewallParent);
+					GameObject sidewall = row.leftSidewallParent.gameObject;
+					if (start)
+					{
+						sidewall = Instantiate(spawnableObjects.sidewall, row.leftSidewallParent);
 
-					sidewalls.Add(sidewall);
+						sidewalls.Add(sidewall);
+					}
+					else
+					{
+						sidewall = row.leftSidewallParent.GetChild(0).gameObject;
+					}
+
+					sidewall.transform.localPosition = -RepositionSidewalls(sidewall)[0];
+					sidewall.transform.rotation = Quaternion.Euler(RepositionSidewalls(sidewall)[1]);
 
 					var rend = sidewall.GetComponent<SpriteRenderer>();
 					// Apply background size
@@ -270,8 +288,20 @@ namespace EndlessRunnerEngine
 				// Right
 				else if (i == 1)
 				{
-					GameObject sidewall = Instantiate(spawnableObjects.sidewall, position, Quaternion.Euler(rotation), row.rightSidewallParent);
-					sidewalls.Add(sidewall);
+					GameObject sidewall = row.rightSidewallParent.gameObject;
+					if (start)
+					{
+						sidewall = Instantiate(spawnableObjects.sidewall, row.rightSidewallParent);
+
+						sidewalls.Add(sidewall);
+					}
+					else
+					{
+						sidewall = row.rightSidewallParent.GetChild(0).gameObject;
+					}
+
+					sidewall.transform.localPosition = RepositionSidewalls(sidewall)[0];
+					sidewall.transform.rotation = Quaternion.Euler(RepositionSidewalls(sidewall)[1]);
 
 					var rend = sidewall.GetComponent<SpriteRenderer>();
 					// Apply background size
@@ -281,11 +311,55 @@ namespace EndlessRunnerEngine
 			}
 		}
 
-		void SpawnBackgrounds(Row row)
+		Vector2[] RepositionSidewalls(GameObject sidewall)
 		{
-			GameObject background = Instantiate(spawnableObjects.background, row.backgroundParent);
+			var erm = EndlessRunnerManager.instance;
+			_ = Vector3.zero;
+			Vector3 rotation = Vector3.zero;
+			Vector3 position;
 
-			backgrounds.Add(background);
+			// Portrait positioning
+			if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
+			{
+				float sidewallSize = (sidewall.GetComponent<SpriteRenderer>().size.x * 5);
+				position = new Vector3((levelData.rowSize.x / 2) + (sidewallSize), 0, 0);
+				Debug.Log("Calculated sidewall positions (Portrait)");
+				return new Vector2[] { position, rotation };
+
+			}
+			// Landscape positioning
+			else
+			{
+				position = new Vector3(0, (levelData.rowSize.y / 2) + ((spawnableObjects.sidewall.GetComponent<SpriteRenderer>().size.y * 10) / 2), 0);
+
+				if (levelData.rotateObjectsToScreenOrientation)
+				{
+					rotation = new Vector3(0, 0, 90);
+				}
+
+				Debug.Log("Calculated sidewall positions (Landscape)");
+
+				return new Vector2[] { position, rotation };
+			}
+
+			Debug.LogError("Failed to reposition sidewalls!");
+			return new Vector2[] { position, rotation };
+		}
+
+		void SpawnBackgrounds(Row row, bool start)
+		{
+			GameObject background = row.backgroundParent.gameObject;
+			if (start)
+			{
+				background = Instantiate(spawnableObjects.background, row.backgroundParent);
+				backgrounds.Add(background);
+
+			}
+			else
+			{
+				background = row.backgroundParent.GetChild(0).gameObject;
+			}
+
 
 			var rend = background.GetComponent<SpriteRenderer>();
 			// Apply background size
