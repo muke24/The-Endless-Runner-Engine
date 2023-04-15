@@ -137,6 +137,8 @@ namespace EndlessRunnerEngine
 			[SerializeField, Tooltip("The whole ui to the game. This can be used to create the entire look of the games user interface.")]
 			internal UITheme uiTheme;
 
+			internal Level currentLevel = null;
+
 			public enum PlayType { Singleplayer, Multiplayer }
 
 			[HideInInspector, Tooltip("Is the game currently singleplayer or multiplayer?")]

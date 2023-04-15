@@ -68,10 +68,18 @@ namespace EndlessRunnerEngine
 
 		internal class Renderers
 		{
-			public List<SpriteRenderer> backgroundRenderers;
-			public List<SpriteRenderer> obstacleRenderers;
-			public List<SpriteRenderer> sidewallRenderers;
-			public List<SpriteRenderer> detailRenderers;
+			internal List<SpriteRenderer> backgroundRenderers = new();
+			internal List<SpriteRenderer> obstacleRenderers = new();
+			internal List<SpriteRenderer> sidewallRenderers = new();
+			internal List<SpriteRenderer> detailRenderers = new();
+
+			internal void InitLists()
+			{
+				sidewallRenderers = new();
+				backgroundRenderers = new();
+				obstacleRenderers = new();
+				detailRenderers = new();
+			}
 		}
 
 		[Serializable]
@@ -88,23 +96,22 @@ namespace EndlessRunnerEngine
 		[SerializeField]
 		private Theme levelTheme;
 		[SerializeField]
-		private Renderers levelRenderers;
+		private Renderers levelRenderers = new();
 		[SerializeField]
 		internal SpawnableObjects spawnableObjects;
 
-		internal int currentLevel = 0;
+		public int currentLevel { get; internal set; } = 0;
 
-		[SerializeField]
-		internal List<Row> rows;
-		[SerializeField]
-		internal List<GameObject> sidewalls;
-		[SerializeField]
-		internal List<GameObject> backgrounds;
-		[SerializeField]
-		internal List<GameObject> details;
-		[SerializeField]
-		internal List<GameObject> obstacles;
-
+		//[SerializeField]
+		internal List<Row> rows = new List<Row>();
+		//[SerializeField]
+		internal List<GameObject> sidewalls = new List<GameObject>();
+		//[SerializeField]
+		internal List<GameObject> backgrounds = new List<GameObject>();
+		//[SerializeField]
+		internal List<GameObject> details = new List<GameObject>();
+		//[SerializeField]
+		internal List<GameObject> obstacles = new List<GameObject>();
 
 		private Light2D levelLighting;
 
@@ -112,7 +119,18 @@ namespace EndlessRunnerEngine
 		{
 			levelData.rowParent = GetComponentInChildren<RowMovement>();
 			levelLighting = GetComponentInChildren<Light2D>();
+			InitLists();
 			LoadLevel();
+			ApplyLevelColoursRaw();
+		}
+
+		void InitLists()
+		{
+			if (levelRenderers == null)
+			{
+				levelRenderers = new Renderers();
+			}
+			levelRenderers.InitLists();
 		}
 
 		private void Update()
@@ -128,17 +146,65 @@ namespace EndlessRunnerEngine
 			}
 		}
 
+		/// <summary>
+		/// Lerps the last level colour to the current level colour
+		/// </summary>
 		public void ApplyLevelColours()
 		{
 			StartCoroutine(LerpbackgroundColours());
-			StartCoroutine(LerpLevelObstacleColours());
-			StartCoroutine(LerpLevelDetailColours());
+			StartCoroutine(LerpSidewallColours());
+			//StartCoroutine(LerpLevelObstacleColours());
+			//StartCoroutine(LerpLevelDetailColours());
+		}
+
+		/// <summary>
+		/// Sets the level colours to the current level without any lerping
+		/// </summary>
+		public void ApplyLevelColoursRaw()
+		{
+			SetBackgroundColour();
+			SetSidewallColour();
+		}
+
+		void SetBackgroundColour()
+		{
+			int length = levelRenderers.backgroundRenderers.Count;
+
+			if (length != 0)
+			{
+				for (int i = 0; i < length; i++)
+				{
+					levelRenderers.backgroundRenderers[i].color = levelTheme.backgroundColours[currentLevel];
+				}
+			}
+			else
+			{
+				Debug.LogError("Unable to set level background colours! Please check if the levelBackgroundColors count is the same as the amount of levels (found in EndlessRunnerManager)");
+			}
+		}
+
+		void SetSidewallColour()
+		{
+			int length = levelRenderers.sidewallRenderers.Count;
+
+			if (length != 0)
+			{
+				for (int i = 0; i < length; i++)
+				{
+					levelRenderers.sidewallRenderers[i].color = levelTheme.sidewallColours[currentLevel];
+				}
+			}
+			else
+			{
+				Debug.LogError("Unable to set level background colours! Please check if the levelBackgroundColors count is the same as the amount of levels (found in EndlessRunnerManager)");
+			}
 		}
 
 		IEnumerator LerpbackgroundColours()
 		{
 			while (true)
 			{
+				//Debug.Log("This works");
 				int length = levelRenderers.backgroundRenderers.Count;
 
 				if (length != 0)
@@ -148,6 +214,36 @@ namespace EndlessRunnerEngine
 						for (int i = 0; i < length; i++)
 						{
 							levelRenderers.backgroundRenderers[i].color = Color.Lerp(levelRenderers.backgroundRenderers[i].color, levelTheme.backgroundColours[currentLevel], levelData.colourChangeSpeed * Time.smoothDeltaTime);
+						}
+						yield return null;
+					}
+					else
+					{
+						yield break;
+					}
+				}
+				else
+				{
+					Debug.LogError("Unable to set level background colours! Please check if the levelBackgroundColors count is the same as the amount of levels (found in EndlessRunnerManager)");
+					yield break;
+				}
+			}
+		}
+
+		IEnumerator LerpSidewallColours()
+		{
+			while (true)
+			{
+				//Debug.Log("This works");
+				int length = levelRenderers.sidewallRenderers.Count;
+
+				if (length != 0)
+				{
+					if (levelRenderers.sidewallRenderers[length - 1].color != levelTheme.sidewallColours[currentLevel])
+					{
+						for (int i = 0; i < length; i++)
+						{
+							levelRenderers.sidewallRenderers[i].color = Color.Lerp(levelRenderers.sidewallRenderers[i].color, levelTheme.sidewallColours[currentLevel], levelData.colourChangeSpeed * Time.smoothDeltaTime);
 						}
 						yield return null;
 					}
@@ -281,6 +377,7 @@ namespace EndlessRunnerEngine
 					sidewall.transform.rotation = Quaternion.Euler(RepositionSidewalls(sidewall)[1]);
 
 					var rend = sidewall.GetComponent<SpriteRenderer>();
+					levelRenderers.sidewallRenderers.Add(rend);
 					// Apply background size
 					var erm = EndlessRunnerManager.instance;
 					if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
@@ -314,6 +411,7 @@ namespace EndlessRunnerEngine
 					sidewall.transform.rotation = Quaternion.Euler(RepositionSidewalls(sidewall)[1]);
 
 					var rend = sidewall.GetComponent<SpriteRenderer>();
+					levelRenderers.sidewallRenderers.Add(rend);
 					// Apply background size
 					var erm = EndlessRunnerManager.instance;
 					if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
@@ -379,6 +477,11 @@ namespace EndlessRunnerEngine
 			}
 
 			var rend = background.GetComponent<SpriteRenderer>();
+			if (levelRenderers.backgroundRenderers == null)
+			{
+				levelRenderers.backgroundRenderers = new List<SpriteRenderer>();
+			}
+			levelRenderers.backgroundRenderers.Add(rend);
 			// Apply background size
 			rend.size = levelData.rowSize / 10;
 			rend.sortingOrder = 1;
