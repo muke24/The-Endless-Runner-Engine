@@ -224,10 +224,13 @@ MonoBehaviour:
     rowSize: {x: 5.75, y: 10}
   levelTheme:
     backgroundColours:
-    - {r: 0.7176471, g: 0.3019608, b: 0.07058824, a: 0}
-    obstacleColours: []
-    sidewallColours: []
-    detailColours: []
+    - {r: 0.94509804, g: 0.43529412, b: 0.14901961, a: 1}
+    obstacleColours:
+    - {r: 0, g: 0, b: 0, a: 1}
+    sidewallColours:
+    - {r: 0.7176471, g: 0.3019608, b: 0.07058824, a: 1}
+    detailColours:
+    - {r: 0, g: 0, b: 0, a: 1}
     lightingColors: []
     lightingIntensity: []
   spawnableObjects:
@@ -238,11 +241,6 @@ MonoBehaviour:
       type: 3}
     detail: {fileID: 0}
     obstacle: {fileID: 0}
-  rows: []
-  sidewalls: []
-  backgrounds: []
-  details: []
-  obstacles: []
 --- !u!1001 &8687745644378299610
 PrefabInstance:
   m_ObjectHideFlags: 0
