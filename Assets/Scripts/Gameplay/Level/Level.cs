@@ -320,21 +320,37 @@ namespace EndlessRunnerEngine
 
 		public void LoadLevel()
 		{
-			if (levelData.rowParent.transform.childCount > 0)
+			if (levelData.gameMode != Data.GameMode.Level)
 			{
-				for (int i = 0; i < levelData.rowParent.transform.childCount; i++)
+				if (levelData.rowParent.transform.childCount > 0)
 				{
-					Debug.Log("Some rows already exist. Deleting them now and spawning new rows.");
-					Destroy(levelData.rowParent.transform.GetChild(i).gameObject);
+					for (int i = 0; i < levelData.rowParent.transform.childCount; i++)
+					{
+						Debug.Log("Some rows already exist. Deleting them now and spawning new rows.");
+						Destroy(levelData.rowParent.transform.GetChild(i).gameObject);
+					}
+				}
+
+				rows = new List<Row>();
+
+				for (int i = 0; i < EndlessRunnerManager.instance.environment.rowsToSpawn; i++)
+				{
+					SpawnRow();
 				}
 			}
-
-			rows = new List<Row>();
-
-			for (int i = 0; i < EndlessRunnerManager.instance.environment.rowsToSpawn; i++)
+			else
 			{
-				SpawnRow();
+				Debug.Log("Level gamemode has been selected. Retrieving all of the obstacles in the level prefab.");
+				RetrieveLevel();
 			}
+		}
+
+		/// <summary>
+		/// Gets references to all of the obstacles for a pre-made level
+		/// </summary>
+		void RetrieveLevel()
+		{
+
 		}
 
 		void SpawnRow()
@@ -380,7 +396,7 @@ namespace EndlessRunnerEngine
 					levelRenderers.sidewallRenderers.Add(rend);
 					// Apply background size
 					var erm = EndlessRunnerManager.instance;
-					if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
+					if (erm.render.direction == EndlessRunnerManager.Render.GameDirection.Down || erm.render.direction == EndlessRunnerManager.Render.GameDirection.Up)
 					{
 						rend.size = levelData.rowSize / 10 * new Vector2(levelData.sidewallWidthMultiplier, 1);
 					}
@@ -414,7 +430,7 @@ namespace EndlessRunnerEngine
 					levelRenderers.sidewallRenderers.Add(rend);
 					// Apply background size
 					var erm = EndlessRunnerManager.instance;
-					if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
+					if (erm.render.direction == EndlessRunnerManager.Render.GameDirection.Down || erm.render.direction == EndlessRunnerManager.Render.GameDirection.Up)
 					{
 						rend.size = levelData.rowSize / 10 * new Vector2(levelData.sidewallWidthMultiplier, 1);
 					}
@@ -434,7 +450,7 @@ namespace EndlessRunnerEngine
 			Vector3 rotation = Vector3.zero;
 
 			// Portrait positioning
-			if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
+			if (erm.render.direction == EndlessRunnerManager.Render.GameDirection.Down || erm.render.direction == EndlessRunnerManager.Render.GameDirection.Up)
 			{
 				float sidewallSize = (sidewall.GetComponent<SpriteRenderer>().size.x * 5);
 				position = new Vector3((levelData.rowSize.x / 2) + (sidewallSize), 0, 0);
@@ -493,7 +509,7 @@ namespace EndlessRunnerEngine
 
 			// Add screen orientation code here
 			var erm = EndlessRunnerManager.instance;
-			if (erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Down || erm.render.direction2D == EndlessRunnerManager.Render.GameDirection2D.Up)
+			if (erm.render.direction == EndlessRunnerManager.Render.GameDirection.Down || erm.render.direction == EndlessRunnerManager.Render.GameDirection.Up)
 			{
 				for (int i = 0; i < rows.Count; i++)
 				{

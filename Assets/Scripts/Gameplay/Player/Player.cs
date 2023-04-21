@@ -12,8 +12,12 @@ namespace EndlessRunnerEngine
 	{
 		[SerializeField]
 		internal Movement movement;
-		public Model model;
-		public Animations animations;
+
+		[SerializeField]
+		internal Model model;
+
+		[SerializeField]
+		internal Animations animations;
 
 		public int playerId { get; internal set; }
 
@@ -22,16 +26,15 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		internal class Movement
 		{
-			[Range(0.5f, 2f), SerializeField, Tooltip("How responsive the player will feel. This is useful for plane games where the player can't instantly move left and right.")]
+			[SerializeField]
+			internal AnimationCurve forwardSpeedByAngle;
+			[SerializeField]
+			internal AnimationCurve sideSpeedByAngle;
+
+			[Range(0.25f, 3f), SerializeField, Tooltip("How responsive the player will feel. This is useful for plane games where the player can't instantly move left and right.")]
 			internal float floatiness = 1;
 
-			[Range(0.5f, 2f), SerializeField, Tooltip("Speed that the player will move side to side.")]
-			internal float sideSpeed = 1;
-
-			[Range(0.5f, 2f), SerializeField, Tooltip("Speed that the player will move forwards.")]
-			internal float forwardSpeed = 1;
-
-			[Range(0.5f, 2f), SerializeField, Tooltip("General speed of the player. This affects both side speed and forwards speed concurrently.")]
+			[Range(0.25f, 3f), SerializeField, Tooltip("General speed of the player. This affects both side speed and forwards speed concurrently.")]
 			internal float generalSpeed = 1;
 
 			internal float playerAngle = 0f;
@@ -39,12 +42,11 @@ namespace EndlessRunnerEngine
 		}
 
 		[Serializable]
-		public class Model
+		internal class Model
 		{
-			[Tooltip("Player sprites must be in order of this: turning left, forward sprite, turning right.")]
-			public Sprite[] playerSprites;
-
 			public Shadow shadow;
+
+			[Serializable]
 			public class Shadow
 			{
 				public enum ShadowType { Round, FromPlayerSprite, None }
@@ -53,34 +55,29 @@ namespace EndlessRunnerEngine
 		}
 
 		[Serializable]
-		public class Animations
+		internal class Animations
 		{
-			public class ThreeDimentional
-			{
-				public AnimationClip forwardAnimation;
-				public AnimationClip leftAnimation;
-				public AnimationClip rightAnimation;
+			[SerializeField, Range(0.1f, 5f)]
+			internal float animationSpeed = 1;
 
-				public AnimationClip jumpingAnimation;
-				public AnimationClip slidingAnimation;
-			}
+			[SerializeField]
+			internal PlayerAnimation[] playerAnimations;
 
-			public class TwoDimentional
+			[Serializable]
+			internal class PlayerAnimation
 			{
-				public Sprite[] forwardAnimation;
-				public Sprite[] leftAnimation;
-				public Sprite[] rightAnimation;
+				[SerializeField, Tooltip("All of the sprites that can activate at this angle. This is useful for a running animation or something similar while having different sprites for each angle.")]
+				internal Sprite[] playerSpritesAtThisAngle;
+				[SerializeField, Range(-90f, 90f)]
+				internal float angleToActivate = 0f;
 			}
 		}
 
-		#region Script movement variables
 		private float horizontalSpeedAngleEffector;
 		private float curAngle;
-		//private float curScaledAngle;
 		private float lastPos;
 		private float spriteAngle;
 		private float spriteAngleSensitivity;
-		#endregion
 
 		void Awake()
 		{
@@ -91,7 +88,7 @@ namespace EndlessRunnerEngine
 		{
 			if (this == EndlessRunnerManager.localPlayer)
 			{
-				rows = EndlessRunnerManager.localRow;
+				rows = EndlessRunnerManager.localBackgroundMovement;
 			}
 		}
 
@@ -105,13 +102,7 @@ namespace EndlessRunnerEngine
 
 		private void Update()
 		{
-			RetrieveControls();
 			PlayerMovement();
-		}
-
-		void RetrieveControls()
-		{
-
 		}
 
 		/// <summary>
@@ -198,8 +189,10 @@ namespace EndlessRunnerEngine
 			{
 				AngleBoundaries();
 
+				transform.position = new Vector3(transform.position.x + PlayerControls.instance.Vertical(playerId) * Time.smoothDeltaTime, 0, 0);
+
 				// Make power number a variable
-				horizontalSpeedAngleEffector = 30f - Mathf.Pow(movement.generalSpeed + movement.sideSpeed, movement.floatiness * 2.375f);
+				//horizontalSpeedAngleEffector = 30f - Mathf.Pow(movement.generalSpeed + movement.sideSpeed, movement.floatiness * 2.375f);
 
 				if (horizontalSpeedAngleEffector < 10)
 				{
@@ -209,7 +202,7 @@ namespace EndlessRunnerEngine
 				//float xPos = transform.position.x + (curAngle / horizontalSpeedAngleEffector) * Time.deltaTime;
 
 				// Scales the angle to the frame animation count for the player
-				int planeAnimFrameCount = (model.playerSprites.Length / 2) - 1;
+				int planeAnimFrameCount = (animations.playerAnimations.Length) - 1;
 				spriteAngle = (int)Scale(-90, 90, -planeAnimFrameCount, planeAnimFrameCount, curAngle * spriteAngleSensitivity);
 			}
 		}

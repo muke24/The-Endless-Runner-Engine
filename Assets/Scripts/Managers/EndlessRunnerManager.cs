@@ -5,7 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MyBox;
-using static UnityEngine.Diagnostics.Utils;
+using UnityEngine.Rendering;
+using System.IO;
+using UnityEngine.SceneManagement;
 
 namespace EndlessRunnerEngine
 {
@@ -37,13 +39,15 @@ namespace EndlessRunnerEngine
 
 		#region Variables
 		public static EndlessRunnerEngine.Player localPlayer;
-		public static RowMovement localRow;
+		public static RowMovement localBackgroundMovement;
 		public static Level currentLoadedLevel;
 		public static bool gameStarted = false;
 
 		[SerializeField]
 		internal Version version;
+
 		public Render render;
+		public Graphics graphics;
 		public Game game;
 		public Scoring scoring;
 		public Connection connection;
@@ -54,7 +58,7 @@ namespace EndlessRunnerEngine
 		public Settings settings;
 
 		[SerializeField]
-		private ScriptOptions scriptOptions;
+		internal ScriptOptions scriptOptions;
 		[SerializeField]
 		private Security security;
 		#endregion
@@ -87,28 +91,39 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		public class Render
 		{
+
 			internal enum RenderType { TwoDimentional, ThreeDimentional }
 
 			[SerializeField, Tooltip("Whether the game should be a 2D game, or a 3D game.")]
 			internal RenderType renderType = RenderType.TwoDimentional;
 
-			internal enum GameDirection2D { Left, Right, Up, Down }
-			[ConditionalField(nameof(renderType), false, RenderType.TwoDimentional), SerializeField, Tooltip("If 2D has been selected, this will affect which direction the player will move in.")]
-			internal GameDirection2D direction2D = GameDirection2D.Down;
-
-			internal enum GameDirection3D { TopDown, AngledTopDown, ThirdPerson, FirstPerson }
-			[ConditionalField(nameof(renderType), false, RenderType.ThreeDimentional), SerializeField, Tooltip("If 3D is selected, this will affect the player's camera positioning.")]
-			internal GameDirection3D direction3D = GameDirection3D.ThirdPerson;
+			internal enum GameDirection { Left, Right, Up, Down, Behind }
+			//[ConditionalField(nameof(renderType), false, RenderType.TwoDimentional), SerializeField, Tooltip("If 2D has been selected, this will affect which direction the player will move in.")]
+			internal GameDirection direction = GameDirection.Down;
 
 			internal enum CameraType { Orthographic, Perspective }
 			[Tooltip("How the camera will render the game (Orthographic or Perspective).")]
 			internal CameraType cameraType;
+		}
 
-			public enum Quality { Low, Medium, High }
-			[Tooltip("Graphics quality level.")]
-			public Quality quality;
+		[Serializable]
+		public class Graphics
+		{
+			[SerializeField, Tooltip("If checked, the ERM graphics settings below will be ignored.")]
+			internal bool useCustomSettings = false;
 
+			[Tooltip("The first asset in the array will represent the lowest graphical settings," +
+				" the higher the asset is in the array the higher the quality level should be. The current render pipeline asset will be swapped with the selected one here.")]
+			public GraphicsQualityAsset[] graphicsQualityAssets;
+			[Tooltip("Adding an asset here will override any previously saved settings. Otherwise it will act as the loaded quality asset.")]
+			public GraphicsQualityAsset currentQuality;
 
+			[Serializable]
+			public class GraphicsQualityAsset
+			{
+				public string qualityName;
+				public RenderPipelineAsset graphicsQualityAsset;
+			}
 		}
 
 		[Serializable]
@@ -127,8 +142,6 @@ namespace EndlessRunnerEngine
 		{
 			[SerializeField]
 			private bool quitIfDeviceCannotBeRecognised = true;
-
-
 		}
 
 		[Serializable]
@@ -161,9 +174,7 @@ namespace EndlessRunnerEngine
 						return true;
 					}
 				}
-
 			}
-
 
 			public enum GameType { Regular, Splitscreen }
 			[HideInInspector, Tooltip("Is the game currently splitscreen?")]
@@ -213,8 +224,11 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		public class ScriptOptions
 		{
-			[Tooltip("How often SlowUpdate() will be called.")]
-			public float slowUpdateTime = 3f;
+			[SerializeField, Tooltip("How often SlowUpdate() will be called.")]
+			internal float slowUpdateTime = 3f;
+
+			[SerializeField, Range(0, 1)]
+			internal float semiSmoothedDeltaTime = 1f;
 		}
 
 		[Serializable]
@@ -229,20 +243,29 @@ namespace EndlessRunnerEngine
 		{
 			[SerializeField]
 			internal bool useSeparateScenes = true;
-			[SerializeField, ConditionalField(nameof(useSeparateScenes))]
-			internal SceneReference startupScene = null;
+
+			internal enum MainMenuRenderType { TwoDimentional, ThreeDimentional }
+
+			[SerializeField]
+			internal MainMenuRenderType mainMenuRenderType = MainMenuRenderType.ThreeDimentional;
+
+			[Space]
 			[SerializeField, ConditionalField(nameof(useSeparateScenes))]
 			internal SceneReference menuScene = null;
 			[SerializeField, ConditionalField(nameof(useSeparateScenes))]
 			internal SceneReference gameScene = null;
 
+			[SerializeField, ConditionalField(nameof(useSeparateScenes), true)]
+			internal GameObject[] gameObjectsToRemoveIfSameScene;
 		}
 
 		[Serializable]
 		public class Settings
 		{
-			public readonly string companyName = "Playify"; 
-			public readonly string gameName = "Paper Plane"; 
+			[SerializeField]
+			internal GameObject ERM_Prefab;
+			//public readonly string companyName = "Playify";
+			//public readonly string gameName = "Paper Plane";
 		}
 		#endregion
 
@@ -250,8 +273,14 @@ namespace EndlessRunnerEngine
 
 		private IEnumerator SlowUpdateCaller()
 		{
+			bool firstUpdate = true;
 			while (true)
 			{
+				if (firstUpdate)
+				{
+					firstUpdate = false;
+					yield return new WaitForSeconds(scriptOptions.slowUpdateTime);
+				}
 				SlowUpdate();
 				yield return new WaitForSeconds(scriptOptions.slowUpdateTime);
 			}
@@ -298,6 +327,7 @@ namespace EndlessRunnerEngine
 		{
 			// Debugging
 			//StartGame(new GameObject());
+			LoadGameQuality();
 			SetupUI();
 		}
 
@@ -306,6 +336,26 @@ namespace EndlessRunnerEngine
 		/// </summary>
 		private void SlowUpdate()
 		{
+			//RefreshERM();
+		}
+
+		public float SemiSmoothedDeltaTime
+		{
+			get
+			{
+				return Time.deltaTime - (Time.deltaTime * scriptOptions.semiSmoothedDeltaTime) + (Time.smoothDeltaTime - (Time.smoothDeltaTime * (1 - scriptOptions.semiSmoothedDeltaTime)));
+			}
+		}
+
+		/// <summary>
+		/// This should be called when a game finishes. This will clear up any garbage collection processes.
+		/// </summary>
+		void RefreshERM()
+		{
+			var newInstance = settings.ERM_Prefab;
+			
+			Instantiate(newInstance);
+			Destroy(gameObject);
 
 		}
 
@@ -323,6 +373,138 @@ namespace EndlessRunnerEngine
 			}
 		}
 
+		void SetGameQuality(Graphics.GraphicsQualityAsset asset)
+		{
+			QualitySettings.renderPipeline = asset.graphicsQualityAsset;
+			graphics.currentQuality = asset;
+		}
+
+		void LoadGameQuality()
+		{
+			if (graphics.currentQuality != null)
+			{
+				if (graphics.currentQuality.graphicsQualityAsset == null)
+				{
+					string saveFile = UnityEngine.Application.dataPath + "/GraphicsSettings.json";
+
+					// Does it exist?
+					if (File.Exists(saveFile))
+					{
+						Debug.Log("Quality file found. Trying to read data from it...");
+						var jsonString = File.ReadAllText(saveFile);
+						var deserialisedFile = JsonUtility.FromJson<Graphics.GraphicsQualityAsset>(jsonString);
+						// File exists!
+						if (deserialisedFile.graphicsQualityAsset != null)
+						{
+							SetGameQuality(deserialisedFile);
+							Debug.Log("Game quality loaded successfully.");
+						}
+						else
+						{
+							CheckIfQualitySettingsExist();
+							Debug.Log("Failed to load quality file. Setting defaults instead...");
+
+						}
+					}
+					else
+					{
+						CheckIfQualitySettingsExist();
+					}
+
+					SaveGameQuality();
+				}
+				else
+				{
+					SetGameQuality(graphics.currentQuality);
+				}
+			}
+			else
+			{
+				graphics.currentQuality = new Graphics.GraphicsQualityAsset();
+
+				string saveFile = UnityEngine.Application.dataPath + "/GraphicsSettings.json";
+
+				// Does it exist?
+				if (File.Exists(saveFile))
+				{
+					Debug.Log("Quality file found. Trying to read data from it...");
+					var jsonString = File.ReadAllText(saveFile);
+					var deserialisedFile = JsonUtility.FromJson<Graphics.GraphicsQualityAsset>(jsonString);
+					// File exists!
+					if (deserialisedFile.graphicsQualityAsset != null)
+					{
+						SetGameQuality(deserialisedFile);
+						Debug.Log("Game quality loaded successfully.");
+					}
+					else
+					{
+						CheckIfQualitySettingsExist();
+						Debug.Log("Failed to load quality file. Setting defaults instead...");
+
+					}
+				}
+				else
+				{
+					CheckIfQualitySettingsExist();
+				}
+
+				SaveGameQuality();
+			}
+		}
+
+		void CheckIfQualitySettingsExist()
+		{
+			if (graphics.graphicsQualityAssets != null || graphics.graphicsQualityAssets.Length > 0)
+			{
+				Debug.LogWarning("Failed to load the last graphics quality asset. Setting the quality to " + graphics.graphicsQualityAssets[(int)graphics.graphicsQualityAssets.Length / 2].qualityName);
+				SetGameQuality(graphics.graphicsQualityAssets[(int)graphics.graphicsQualityAssets.Length / 2]);
+			}
+			else
+			{
+				Debug.LogWarning("Failed to load the last quality asset and no render pipeline assets have been added to the graphics section in this script. Using Unity's current settings instead.");
+
+				SetCustomQualitySettings();
+			}
+		}
+
+		void SaveGameQuality()
+		{
+			if (!graphics.useCustomSettings)
+			{
+				if (graphics.currentQuality == null)
+				{
+					// Create an error msg handler for viewing errors in the game.
+					Debug.Log("Unable to save current quality settings. Saving defaults instead.");
+
+					CheckIfQualitySettingsExist();
+				}
+
+				string qual = JsonUtility.ToJson(graphics.currentQuality);
+				File.WriteAllText(UnityEngine.Application.dataPath + "/GraphicsSettings.json", qual);
+
+				QualitySettings.renderPipeline = graphics.currentQuality.graphicsQualityAsset;
+			}
+			else
+			{
+				SetCustomQualitySettings();
+			}
+		}
+
+		void SetCustomQualitySettings()
+		{
+			graphics.currentQuality = new Graphics.GraphicsQualityAsset();
+			graphics.currentQuality.qualityName = "Custom";
+
+			if (QualitySettings.renderPipeline != null)
+			{
+				graphics.currentQuality.graphicsQualityAsset = QualitySettings.renderPipeline;
+			}
+			else
+			{
+				Debug.Log("This may be an error, or the current render pipeline is set to standard. Will need to test. Shouldn't affect anything however.");
+			}
+		}
+
 		private void SetupUI()
 		{
 			UIManager.instance.ApplyUITheme();
@@ -332,26 +514,77 @@ namespace EndlessRunnerEngine
 		/// Starts the game given the selected level prefab
 		/// </summary>
 		/// <param name="level"></param>
-		public void StartGame(GameObject selectedLevel)
+		public void StartGame(Level selectedLevel)
 		{
 			Debug.Log("Starting Game!");
-			RetrieveLocalRow(selectedLevel);
+			RetrievelocalBackgroundMovement(selectedLevel);
 		}
 
-		void RetrieveLocalRow(GameObject selectedLevel)
+		IEnumerator LoadGame(Level selectedLevel)
 		{
-			GameObject spawnedLevel = Instantiate(selectedLevel);
+			// The Application loads the Scene in the background as the current Scene runs.
+			// This is particularly good for creating loading screens.
+			// You could also load the Scene by using sceneBuildIndex. In this case Scene2 has
+			// a sceneBuildIndex of 1 as shown in Build Settings.
 
-			localRow = spawnedLevel.GetComponentInChildren<RowMovement>();
+			AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scene.gameScene.SceneName);
+			asyncLoad.allowSceneActivation = true;
+
+			// Wait until the asynchronous scene fully loads
+			while (!asyncLoad.isDone)
+			{
+				yield return null;
+			}
+
+			while (asyncLoad.isDone)
+			{
+				SpawnLevel(selectedLevel);
+				// Do whatever
+				yield break;
+			}
+		}
+
+		void RetrievelocalBackgroundMovement(Level selectedLevel)
+		{
+			if (scene.useSeparateScenes)
+			{
+				// Load game scene asynchronously (empty scene prefab)
+				StartCoroutine(LoadGame(selectedLevel));
+
+
+
+				// Play scene animation
+			}
+			else
+			{
+				// Play animation
+				SpawnLevel(selectedLevel);
+			}
+		}
+
+		void SpawnLevel(Level selectedLevel)
+		{
+			Debug.Log("Spawning the selected level.");
+			GameObject spawnedLevel = Instantiate(selectedLevel.gameObject, Vector3.zero, Quaternion.identity);
+
+			localBackgroundMovement = spawnedLevel.GetComponentInChildren<RowMovement>();
 
 			// Crash application if cannot find RowMovement script
-			if (localRow == null)
+			if (localBackgroundMovement == null)
 			{
 				Debug.LogError("Unable to fetch the RowMovement script in the selected level prefab! Forcing crash...");
 				//ForceCrash(UnityEngine.Diagnostics.ForcedCrashCategory.FatalError);
 				UnityEngine.Application.Quit();
 			}
+			if (!scene.useSeparateScenes)
+			{
+				for (int i = 0; i < scene.gameObjectsToRemoveIfSameScene.Length; i++)
+				{
+					Destroy(scene.gameObjectsToRemoveIfSameScene[i]);
+				}
+			}
 		}
+
 		#endregion
 	}
 }

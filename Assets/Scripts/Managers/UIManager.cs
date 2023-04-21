@@ -30,6 +30,7 @@ namespace EndlessRunnerEngine
 		public GameStarting gameStartingUI;
 		public InGame inGameUI;
 		public Death deathUI;
+		public Shop shopUI;
 
 		[Serializable]
 		public class Pages
@@ -165,7 +166,7 @@ namespace EndlessRunnerEngine
 		public void ApplyMainMenuTheme()
 		{
 			int platform = (int)erm.version.platformType;
-			mainMenuUI.copyrightText[platform].text = "Copyright © " + erm.settings.companyName + " 2023. All Rights Reserved.";
+			mainMenuUI.copyrightText[platform].text = "Copyright © " + Application.companyName + " 2023. All Rights Reserved.";
 			mainMenuUI.clickToPlayText[platform].text = uiTheme.menuUI.clickToPlayText;
 			
 			ApplyTitle(mainMenuUI.titleText[platform], mainMenuUI.titleImage[platform]);
@@ -176,7 +177,7 @@ namespace EndlessRunnerEngine
 			
 			if (uiTheme.global.titleImage == null)
 			{
-				titleText.text = erm.settings.gameName;
+				titleText.text = Application.productName;
 			}
 			else
 			{

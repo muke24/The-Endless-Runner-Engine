@@ -55,7 +55,7 @@ namespace EndlessRunnerEngine
 				{
 					angleMoved = 0;
 					countdownCount--;
-					Debug.Log("Countdown should be at: " + countdownCount);
+					//Debug.Log("Countdown should be at: " + countdownCount);
 				}
 
 				textPivot.Rotate(rotationSpeed, 0, 0);

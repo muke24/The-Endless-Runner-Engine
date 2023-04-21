@@ -62,10 +62,15 @@ namespace EndlessRunnerEngine
 			[Serializable]
 			public class KeyboardControls
 			{
-				public AnimationCurve axisCurve;
-				public float axisDeadZone = 0.05f;
+				[SerializeField]
+				internal AnimationCurve axisCurve;
+				[SerializeField]
+				internal float axisSpeed = 5f;
 
-				[SearchableEnum]
+				[SerializeField, Range(0.025f, 0.25f)]
+				internal float axisDeadZone = 0.05f;
+
+				[SearchableEnum, Space]
 				public KeyCode forwardButton = KeyCode.UpArrow;
 				[SearchableEnum]
 				public KeyCode backwardButton = KeyCode.DownArrow;
@@ -121,66 +126,72 @@ namespace EndlessRunnerEngine
 			[Serializable]
 			public class CameraControls
 			{
-				[Tooltip("Using a camera to body track the player can cause jittery movement sometimes. This allows smoothing of the jitters.")]
-				public float cameraSmoothing;
+				[Range(0, 1), Tooltip("Using a camera to body track the player can cause jittery movement sometimes. This allows smoothing of the jitters.")]
+				public float positionSmoothing;
 			}
 			#endregion
 
 		}
 
-		private float lastVertical;
-		public float Vertical(int playerId)
+		private float lastHor = 0f;
+
+		public float Horizontal(int playerId)
 		{
-			float axis = lastVertical;
-			//int playerId = EndlessRunnerManager.localPlayer.playerId;
 			Control playerControls = controls[playerId];
+			float curHor = 0;
 
 			if (playerControls.selectedControl == Control.ControlType.Keyboard)
 			{
-				var render = EndlessRunnerManager.instance.render;
+				bool fwd = Input.GetKey(playerControls.keyboardControls.forwardButton) | Input.GetKey(playerControls.keyboardControls.alternativeControls.forwardButton);
+				bool lft = Input.GetKey(playerControls.keyboardControls.leftButton) | Input.GetKey(playerControls.keyboardControls.alternativeControls.leftButton);
+				bool rgt = Input.GetKey(playerControls.keyboardControls.rightButton) | Input.GetKey(playerControls.keyboardControls.alternativeControls.rightButton);
 
-				// Game Orientation
-				var down = EndlessRunnerManager.Render.GameDirection2D.Down;
-				var up = EndlessRunnerManager.Render.GameDirection2D.Up;
-
-				float curVert = 0;
-
-				// If game orientation is vertical
-				if (render.direction2D == up || render.direction2D == down)
+				// Start a timer and fix axis curve using the timer
+				if (fwd && !lft && !rgt)
 				{
-					if (Input.GetKey(playerControls.keyboardControls.forwardButton))
-					{
-						curVert = lastVertical + playerControls.keyboardControls.axisCurve.Evaluate(lastVertical) * Time.deltaTime;
-						Debug.Log("Forward axis is currently: " + curVert);
-
-						return curVert;
-					}
-					else if (lastVertical > playerControls.keyboardControls.axisDeadZone)
-					{
-
-						curVert = lastVertical - playerControls.keyboardControls.axisCurve.Evaluate(lastVertical) * Time.deltaTime;
-						Debug.Log("Forward axis is currently: " + curVert);
-
-						return curVert;
-					}
-					else
-					{
-						lastVertical = 0f;
-						curVert = 0f;
-						Debug.Log("Forward axis is currently: " + curVert);
-
-						return curVert;
-					}
+					curHor = 0;
 				}
-				// If game orientation is horizontal
+				else if (fwd && lft && !rgt)
+				{
+					curHor = -0.5f;
+				}
+				else if (fwd && !lft && rgt)
+				{
+					curHor = 0.5f;
+				}
+				else if (!fwd && !lft && rgt)
+				{
+					curHor = 1;
+				}
+				else if (!fwd && lft && !rgt)
+				{
+					curHor = -1;
+				}
 				else
 				{
-
+					curHor = 0;
 				}
 
-				return axis;
+				lastHor = Mathf.Lerp(lastHor, curHor, playerControls.keyboardControls.axisSpeed * Time.smoothDeltaTime);
+
+				return lastHor;
 			}
+
 			// This is here for now to remove error
+			return curHor;
+		}
+
+		public float Vertical(int playerId)
+		{
+			if (Horizontal(playerId) > 0)
+			{
+				return (1 - Horizontal(playerId));
+			}
+			else if (Horizontal(playerId) < 0)
+			{
+				return (1 + Horizontal(playerId));
+			}
+
 			return 0;
 		}
 	}

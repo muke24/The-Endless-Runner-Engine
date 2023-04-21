@@ -77,36 +77,36 @@ namespace EndlessRunnerEngine
 			//}
 			//#endregion
 
-			#region Spawn new rows
-			int rowsToSpawn = EndlessRunnerManager.instance.environment.rowsToSpawn;
+			//#region Spawn new rows
+			//int rowsToSpawn = EndlessRunnerManager.instance.environment.rowsToSpawn;
 
-			internalValues.spawnedRows = new Row[rowsToSpawn];
+			//internalValues.spawnedRows = new Row[rowsToSpawn];
 
-			for (int i = 0; i < rowsToSpawn; i++)
-			{
-				//internalValues.spawnedRows[i] = Instantiate(customisation.rowsThatCanSpawn[UnityEngine.Random.Range(0, customisation.rowsThatCanSpawn.Length)]);
+			//for (int i = 0; i < rowsToSpawn; i++)
+			//{
+			//	//internalValues.spawnedRows[i] = Instantiate(customisation.rowsThatCanSpawn[UnityEngine.Random.Range(0, customisation.rowsThatCanSpawn.Length)]);
 
-				if (rowsToSpawn > customisation.rowsThatCanSpawn.Length)
-				{
+			//	if (rowsToSpawn > customisation.rowsThatCanSpawn.Length)
+			//	{
 
-				}
-				else if (rowsToSpawn < customisation.rowsThatCanSpawn.Length)
-				{
-					// Set this so it spawns the rest in another for loop
-					if (i == rowsToSpawn - 1) // If last obstacle in obstacles to spawn is being spawned but more obstacles are to spawn
-					{
-						for (int x = 0; x < (customisation.rowsThatCanSpawn.Length - rowsToSpawn); x++)
-						{
+			//	}
+			//	else if (rowsToSpawn < customisation.rowsThatCanSpawn.Length)
+			//	{
+			//		// Set this so it spawns the rest in another for loop
+			//		if (i == rowsToSpawn - 1) // If last obstacle in obstacles to spawn is being spawned but more obstacles are to spawn
+			//		{
+			//			for (int x = 0; x < (customisation.rowsThatCanSpawn.Length - rowsToSpawn); x++)
+			//			{
 
-						}
-					}
-				}
-				else
-				{
-					internalValues.spawnedRows[i] = Instantiate(customisation.rowsThatCanSpawn[i]);
-				}
-			}
-			#endregion
+			//			}
+			//		}
+			//	}
+			//	else
+			//	{
+			//		internalValues.spawnedRows[i] = Instantiate(customisation.rowsThatCanSpawn[i]);
+			//	}
+			//}
+			//#endregion
 		}
 
 		private void Update()

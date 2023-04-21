@@ -34,11 +34,21 @@ namespace EndlessRunnerEngine
 		[SerializeField]
 		private Button[] startGameButton;
 
-		private void Start()
+		[SerializeField]
+		private Button[] shopButton;
+
+		private void OnEnable()
 		{
 			StartFadeAnimation();
 			StartTextAnimation();
 			SetupButtons();
+		}
+
+		private void OnDisable()
+		{
+			StopCoroutine(AnimateFade());
+			StopCoroutine(TextAnimate());
+			UnsetupButtons();
 		}
 
 		void SetupButtons()
@@ -57,7 +67,29 @@ namespace EndlessRunnerEngine
 			{
 				startGameButton[i].onClick.AddListener(StartGameButtonPressed);
 			}
-			
+
+			for (int i = 0; i < shopButton.Length; i++)
+			{
+				shopButton[i].onClick.AddListener(ShopButtonPressed);
+			}
+		}
+
+		void UnsetupButtons()
+		{
+			for (int i = 0; i < settingsButton.Length; i++)
+			{
+				settingsButton[i].onClick.RemoveListener(SettingsButtonPressed);
+			}
+
+			for (int i = 0; i < personalisationButton.Length; i++)
+			{
+				personalisationButton[i].onClick.RemoveListener(PersonalisationButtonPressed);
+			}
+
+			for (int i = 0; i < startGameButton.Length; i++)
+			{
+				startGameButton[i].onClick.RemoveListener(StartGameButtonPressed);
+			}
 		}
 
 		void StartGameButtonPressed()
@@ -79,6 +111,13 @@ namespace EndlessRunnerEngine
 			Debug.Log("Personalisation button pressed.");
 			// CHANGE: Play animation here.
 			UIManager.instance.SetPage(3);
+		}
+
+		void ShopButtonPressed()
+		{
+			Debug.Log("Shop button pressed.");
+			// CHANGE: Play animation here.
+			UIManager.instance.SetPage(7);
 		}
 
 		void StartFadeAnimation()
