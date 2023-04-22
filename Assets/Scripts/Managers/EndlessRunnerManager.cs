@@ -8,10 +8,10 @@ using MyBox;
 using UnityEngine.Rendering;
 using System.IO;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace EndlessRunnerEngine
 {
-
 	public class EndlessRunnerManager : MonoBehaviour
 	{
 		#region Singleton
@@ -42,6 +42,7 @@ namespace EndlessRunnerEngine
 		public static RowMovement localBackgroundMovement;
 		public static Level currentLoadedLevel;
 		public static bool gameStarted = false;
+		public static List<EndlessRunnerEngine.Player> connectedPlayers;
 
 		[SerializeField]
 		internal Version version;
@@ -67,14 +68,21 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		internal class Version
 		{
+			internal string ERM_Version
+			{
+				get
+				{
+					return "0.0.0.1" + " " + gameVersion;
+				}
+			}
+
 			internal enum GameVersion { Regular, Business, Educational, Rental }
 
 			[Tooltip("For business use. Remove this when on asset store.")]
-			internal GameVersion gameVersion;
+			internal GameVersion gameVersion = GameVersion.Rental;
 
 			public enum PlatformScreens { Landscape = 1, Portrait = 0 }
-			[SerializeField]
-			public PlatformScreens platformScreens;
+			public PlatformScreens platformScreens { get; internal set; }
 			public int platformScreensCount
 			{
 				get
@@ -91,7 +99,6 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		public class Render
 		{
-
 			internal enum RenderType { TwoDimentional, ThreeDimentional }
 
 			[SerializeField, Tooltip("Whether the game should be a 2D game, or a 3D game.")]
@@ -191,6 +198,11 @@ namespace EndlessRunnerEngine
 			internal int currentConnections = 0;
 			[Tooltip("The amount of players currently playing same server you are connected to.")]
 			internal int currentPlayers = 0;
+
+			public string localUsername = "Player69";
+
+			[SerializeField]
+			internal bool connectToServerOnStartup = false;
 		}
 
 		[Serializable]
@@ -262,14 +274,68 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		public class Settings
 		{
-			[SerializeField]
+			[SerializeField, Tooltip("Do not change this prefab unless you know what you're doing.")]
 			internal GameObject ERM_Prefab;
+
+			[SerializeField, Tooltip("Do not change to false unless you know what you're doing.")]
+			internal bool ermIsInstanced = true;
+
+			[ConditionalField(nameof(ermIsInstanced), false, false)]
+			public bool gameIsInWorldSpace = false;
 			//public readonly string companyName = "Playify";
 			//public readonly string gameName = "Paper Plane";
 		}
 		#endregion
 
 		#region Coroutines
+
+		void CreateVersionUI()
+		{
+			// Yucky code but it works lol
+
+			if (!version.ERM_Version.Contains("Regular"))
+			{
+				var canv = new GameObject().AddComponent<Canvas>();
+				canv.transform.SetParent(transform);
+				var scaler = canv.gameObject.AddComponent<CanvasScaler>();
+				scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+				scaler.referenceResolution = new Vector2(1080, 1920);
+				canv.renderMode = RenderMode.ScreenSpaceOverlay;
+
+				int highestSort = 0;
+				var allCanvs = FindObjectsOfType<Canvas>();
+				for (int i = 0; i < allCanvs.Length; i++)
+				{
+					if (allCanvs[i].sortingOrder >= highestSort)
+					{
+						highestSort = allCanvs[i].sortingOrder + 1;
+					}
+				}
+
+				canv.sortingOrder = highestSort;
+
+				var text = new GameObject().AddComponent<TMPro.TextMeshProUGUI>();
+				text.transform.SetParent(canv.transform);
+				//var text = Instantiate(go, canv.transform);
+
+				canv.gameObject.name = "ERM_Version_Canvas";
+				text.gameObject.name = "ERM_Version_Text";
+
+				text.text = version.ERM_Version;
+				text.rectTransform.sizeDelta = new Vector2(400, 50);
+				//Vector2 pos = new Vector2(0, -canv.GetComponent<CanvasScaler>().referenceResolution.y - 270) / 2;
+				//text.rectTransform.anchoredPosition = pos - new Vector2(0, text.rectTransform.sizeDelta.y);
+				text.color = Color.black;
+				text.alignment = TMPro.TextAlignmentOptions.Midline;
+
+				text.rectTransform.anchorMax = new Vector2(0.5f, 0f);
+				text.rectTransform.anchorMin = new Vector2(0.5f, 0f);
+				text.rectTransform.pivot = new Vector2(0.5f, 0f);
+
+				text.rectTransform.position = Vector2.zero;
+				text.rectTransform.localPosition = new Vector2(0, text.rectTransform.localPosition.y);
+			}
+		}
 
 		private IEnumerator SlowUpdateCaller()
 		{
@@ -291,13 +357,16 @@ namespace EndlessRunnerEngine
 		#region Methods
 		private void Awake()
 		{
-			if (instance != null && instance != this)
+			if (settings.ermIsInstanced)
 			{
-				Destroy(this);
-			}
-			else
-			{
-				instance = this;
+				if (instance != null && instance != this)
+				{
+					Destroy(this);
+				}
+				else
+				{
+					instance = this;
+				}
 			}
 
 			DontDestroyOnLoad(gameObject);
@@ -329,6 +398,8 @@ namespace EndlessRunnerEngine
 			//StartGame(new GameObject());
 			LoadGameQuality();
 			SetupUI();
+			CreateVersionUI();
+			Debug.Log("Endless Runner Manager started! Version: " + version.ERM_Version);
 		}
 
 		/// <summary>
@@ -353,23 +424,45 @@ namespace EndlessRunnerEngine
 		void RefreshERM()
 		{
 			var newInstance = settings.ERM_Prefab;
-			
+
 			Instantiate(newInstance);
 			Destroy(gameObject);
+		}
 
+		void LoadAds()
+		{
+			if (!settings.ermIsInstanced)
+			{
+				return;
+			}
+		}
+
+		void Login()
+		{
+			if (!settings.ermIsInstanced)
+			{
+				return;
+			}
 		}
 
 		void CheckScreenType()
 		{
-			// If landscape
-			if (Screen.currentResolution.width > Screen.currentResolution.height)
+			if (settings.ermIsInstanced)
 			{
-				version.platformScreens = Version.PlatformScreens.Landscape;
+				// If landscape
+				if (Screen.currentResolution.width > Screen.currentResolution.height)
+				{
+					version.platformScreens = Version.PlatformScreens.Landscape;
+				}
+				// If portrait
+				else
+				{
+					version.platformScreens = Version.PlatformScreens.Portrait;
+				}
 			}
-			// If portraite
 			else
 			{
-				version.platformScreens = Version.PlatformScreens.Portrait;
+
 			}
 		}
 
@@ -584,7 +677,6 @@ namespace EndlessRunnerEngine
 				}
 			}
 		}
-
 		#endregion
 	}
 }

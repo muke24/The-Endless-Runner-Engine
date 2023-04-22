@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54b7e5db080d72a439110f99ffdb591b, type: 3}
+  m_Name: Paper Plane UI Theme
+  m_EditorClassIdentifier: 
+  global:
+    titleImages: {fileID: 0}
+    collectableRefImg: {fileID: 0}
+    titleTexts:
+      text: Paper Plane
+      fontSize: 0
+      font: {fileID: 0}
+    copyrightTexts:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+  menuUI:
+    settingsButtonImg: {fileID: 0}
+    personalisationButtonImg: {fileID: 0}
+    clickToPlayText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+  gameStartingUI:
+    tooltipText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+  inGameUI:
+    scoreRefText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+    collectableRefText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+    scoreText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+    collectableText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+  deathUI:
+    youDiedText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+    scoreRefText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+    collectableRefText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+    scoreText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+    collectableText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+  shopUI:
+    subtitleText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+  settingsUI:
+    subtitleText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+  multiplayerUI:
+    subtitleText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+  leaderboardUI:
+    subtitleText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}
+  personalisationUI:
+    subtitleText:
+      text: 
+      fontSize: 0
+      font: {fileID: 0}

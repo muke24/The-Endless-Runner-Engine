@@ -1,0 +1,16 @@
+{
+    "name": "Connection",
+    "rootNamespace": "EndlessRunnerEngine",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "TERE_CONNECTION_EXISTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

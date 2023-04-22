@@ -167,7 +167,7 @@ namespace EndlessRunnerEngine
 		{
 			int platform = (int)erm.version.platformType;
 			mainMenuUI.copyrightText[platform].text = "Copyright © " + Application.companyName + " 2023. All Rights Reserved.";
-			mainMenuUI.clickToPlayText[platform].text = uiTheme.menuUI.clickToPlayText;
+			mainMenuUI.clickToPlayText[platform].text = uiTheme.menuUI.clickToPlayText.text;
 			
 			ApplyTitle(mainMenuUI.titleText[platform], mainMenuUI.titleImage[platform]);
 		}
@@ -175,14 +175,14 @@ namespace EndlessRunnerEngine
 		private void ApplyTitle(TextMeshProUGUI titleText, Image titleImg)
 		{
 			
-			if (uiTheme.global.titleImage == null)
+			if (uiTheme.global.titleImages == null)
 			{
 				titleText.text = Application.productName;
 			}
 			else
 			{
 				titleText.text = "";
-				titleImg.sprite = uiTheme.global.titleImage;
+				titleImg.sprite = uiTheme.global.titleImages;
 			}
 		}
 

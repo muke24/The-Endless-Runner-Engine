@@ -92,7 +92,7 @@ namespace EndlessRunnerEngine
 		[SerializeField]
 		private Debugging debugging;
 		[SerializeField]
-		private Data levelData;
+		internal Data levelData;
 		[SerializeField]
 		private Theme levelTheme;
 		[SerializeField]

@@ -53,22 +53,52 @@ namespace EndlessRunnerEngine
 		{
 			if (EndlessRunnerManager.gameStarted)
 			{
-				if (playerToFollow == null)
+				if (EndlessRunnerManager.connectedPlayers.Count <= 1)
 				{
-					playerToFollow = EndlessRunnerManager.localPlayer;
-				}
+					if (playerToFollow == null)
+					{
+						playerToFollow = EndlessRunnerManager.localPlayer;
+					}
 
-				if (EndlessRunnerManager.instance.render.direction == EndlessRunnerManager.Render.GameDirection.Down ||
-					EndlessRunnerManager.instance.render.direction == EndlessRunnerManager.Render.GameDirection.Up)
-				{
-					sidewaysVelocity = curVelocity.x;
+					if (EndlessRunnerManager.instance.render.direction == EndlessRunnerManager.Render.GameDirection.Down ||
+						EndlessRunnerManager.instance.render.direction == EndlessRunnerManager.Render.GameDirection.Up)
+					{
+						sidewaysVelocity = curVelocity.x;
+					}
+					else
+					{
+						sidewaysVelocity = curVelocity.y;
+					}
+
+					transform.position = Vector3.SmoothDamp(transform.position, playerToFollow.transform.position / sidewaysPositionMultiplier, ref curVelocity, (positionSmoothingAmount + (sidewaysVelocity * velocityMultiplier)) * Time.smoothDeltaTime);
 				}
 				else
 				{
-					sidewaysVelocity = curVelocity.y;
-				}
+					// Camera will zoom out to view both players (until the camera reaches the max
+					// size and the player falling behind will go outside of the camera view with
+					// a mario-like UI showing the player is off the screen)
 
-				transform.position = Vector3.SmoothDamp(transform.position, playerToFollow.transform.position / sidewaysPositionMultiplier, ref curVelocity, (positionSmoothingAmount + (sidewaysVelocity * velocityMultiplier)) * Time.smoothDeltaTime);
+					Vector3 middlePos = Vector3.zero;
+
+					for (int i = 0; i < EndlessRunnerManager.connectedPlayers.Count; i++)
+					{
+						middlePos += EndlessRunnerManager.connectedPlayers[i].transform.position;
+					}
+
+					middlePos /= EndlessRunnerManager.connectedPlayers.Count;
+
+					if (EndlessRunnerManager.instance.render.direction == EndlessRunnerManager.Render.GameDirection.Down ||
+						EndlessRunnerManager.instance.render.direction == EndlessRunnerManager.Render.GameDirection.Up)
+					{
+						sidewaysVelocity = curVelocity.x;
+					}
+					else
+					{
+						sidewaysVelocity = curVelocity.y;
+					}
+
+					transform.position = Vector3.Lerp(transform.position, middlePos / sidewaysPositionMultiplier, positionSmoothingAmount * Time.smoothDeltaTime);
+				}
 			}
 		}
 
