@@ -246,6 +246,7 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		public class Application
 		{
+			public bool useVsync;
 
 			public int targetFps = 0;
 
