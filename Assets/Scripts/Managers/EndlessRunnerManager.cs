@@ -246,8 +246,11 @@ namespace EndlessRunnerEngine
 		[Serializable]
 		public class Application
 		{
-			public bool useVsync = false;
+
 			public int targetFps = 0;
+
+			[SerializeField]
+			internal bool overrideUnitySettings = true;
 		}
 
 		[Serializable]
@@ -386,6 +389,7 @@ namespace EndlessRunnerEngine
 		{
 			StartCoroutine(SlowUpdateCaller());
 			CheckScreenType();
+			ApplyStartingGraphics();
 			//version.platformScreensCount = Enum.GetValues(typeof(Version.PlatformScreens)).Length;
 		}
 
@@ -408,6 +412,15 @@ namespace EndlessRunnerEngine
 		private void SlowUpdate()
 		{
 			//RefreshERM();
+		}
+
+		void ApplyStartingGraphics()
+		{
+			if (application.overrideUnitySettings)
+			{
+				QualitySettings.vSyncCount = application.useVsync ? 1 : 0;
+				UnityEngine.Application.targetFrameRate = application.targetFps;
+			}
 		}
 
 		public float SemiSmoothedDeltaTime
